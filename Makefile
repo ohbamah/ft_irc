@@ -6,7 +6,7 @@
 #    By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/13 16:21:19 by ymanchon          #+#    #+#              #
-#    Updated: 2025/02/11 15:28:29 by ymanchon         ###   ########.fr        #
+#    Updated: 2025/02/12 20:48:29 by ymanchon         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,7 +34,7 @@ NAME = ft_irc
 
 CXX = @c++
 
-SRCS =	./src/ft_irc.cpp \
+SRCS =	./src/Irc.cpp \
 		./src/Socket.cpp \
 		./src/Poll.cpp \
 		./main.cpp

@@ -6,11 +6,11 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:21:34 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/11 15:26:58 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/12 20:47:56 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_irc.hpp"
+#include "Irc.hpp"
 
 static void	no_args(void)
 {
@@ -22,6 +22,6 @@ int	main(int ac, char** av)
 	if (ac != 3)
 		no_args();
 	else
-		ft_irc(av[1], av[2]);
+		return (Irc::Start(std::atoi(av[1]), av[2]));
 	return (0);
 }

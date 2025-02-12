@@ -1,1 +1,1 @@
-objs/./main.obj: main.cpp includes/ft_irc.hpp
+objs/./main.obj: main.cpp includes/Irc.hpp

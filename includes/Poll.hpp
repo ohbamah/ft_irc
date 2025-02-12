@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/12 19:28:48 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/12 20:15:47 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ private:
 	int		count;
 
 public:
-	struct InvalidFdsCount { virtual const char* what(void) throw() { return ("Invalid count of fds."); }};
+	struct InvalidFdsCount : std::exception { virtual const char* what(void) const throw() { return ("Invalid count of fds."); }};
 };
 
 #endif

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_irc.hpp                                         :+:      :+:    :+:   */
+/*   Irc.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:25:43 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/11 15:31:22 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/12 20:48:36 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,17 @@
 #define FT_IRC_HPP
 
 # include <iostream>
-
 # include <signal.h>
 # include <sys/stat.h>
+# include <cstdlib>
 
-void	ft_irc(char* port, char* pass);
+class Irc
+{
+public:
+	int
+	static Start(int port, const char* pass);
+
+private:
+};
 
 #endif
