@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/12 21:18:20 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/13 02:47:23 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ struct SocketInfo
 	int			port;
 };
 
-class SocketInstance;
+class SocketRemote;
 
 class Socket
 {
@@ -36,8 +36,19 @@ public:
 	Socket(int af, int type, int prot);
 	virtual ~Socket();
 
-	SocketInstance
-	Accept();
+	template <typename T>
+	int
+	Recv(T& data, int nbytes = sizeof(T));
+	template <typename T>
+	int
+	Send(const T& data, int nbytes = sizeof(T));
+
+	void
+	SetOptions(int flags);
+	void
+	Listen(void);
+	SocketRemote
+	Accept(void);
 	void
 	Connect(const Socket& socket, const char *address, int port);
 	void
@@ -55,6 +66,7 @@ protected:
 	bool		bound;
 	bool		connected;
 	bool		client;
+	bool		listener;
 	int			com;	// the communication fd
 	int			fd;
 
@@ -68,6 +80,12 @@ public:
 	struct CantConnectAServer : std::exception { inline virtual const char* what(void) const throw() {return ("Can not connect a server socket\n"); } };
 	struct IsNotAServer : std::exception { inline virtual const char* what(void) const throw() {return ("Can not accept anything, because socket is not a server\n"); } };
 	struct CantAccept : std::exception { inline virtual const char* what(void) const throw() {return ("Server can not accept client\n"); } };
+	struct CantListen : std::exception { inline virtual const char* what(void) const throw() {return ("Server can not listen\n"); } };
+	struct IsNotListening : std::exception { inline virtual const char* what(void) const throw() {return ("Server is not listening\n"); } };
+	struct FailedRecv : std::exception { inline virtual const char* what(void) const throw() {return ("Failed to receive data\n"); } };
+	struct FailedSend : std::exception { inline virtual const char* what(void) const throw() {return ("Failed to send data\n"); } };
+	struct CantRecv : std::exception { inline virtual const char* what(void) const throw() {return ("Can not receive data\n"); } };
+	struct CantSend : std::exception { inline virtual const char* what(void) const throw() {return ("Can not send data\n"); } };
 
 public:
 		// Socket protocol
@@ -146,14 +164,25 @@ public:
 	};
 };
 
-class SocketInstance : private Socket
+class SocketRemote : private Socket
 {
 public:
-	SocketInstance(int fd);
-	virtual ~SocketInstance();
+	SocketRemote(int fd);
+	virtual ~SocketRemote();
 
 	void
 	SetInfo(const char* addr, int port);
+	int
+	Get(void);
+
+	template <typename T>
+	int
+	Recv(T& data, int nbytes = sizeof(T));
+	template <typename T>
+	int
+	Send(const T& data, int nbytes = sizeof(T));
 };
+
+# include "Socket.inl"
 
 #endif

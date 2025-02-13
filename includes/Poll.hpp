@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Poll.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/12 20:15:47 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/13 02:43:35 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,17 @@
 
 # include <poll.h>
 # include <exception>
+# include <vector>
 
 class Poll
 {
 public:
-	Poll(int pfds[], int pcount, int ptimeout);
+	Poll(void);
+	Poll(int pfds[], int pcount);
 	~Poll();
+
+	int
+	Check(int timeout);
 
 	void
 	AddFd(int fd);
@@ -53,16 +58,15 @@ public:
 	IsInvalidFd(int fd);
 
 private:
-	Poll(void);
 	Poll(const Poll&);
 
 	void
 	FindCorrectFd(int fd);
 
 private:
-	pollfd*	pollfds;
-	pollfd	last;
-	int		count;
+	std::vector<pollfd>	pollfds;
+	pollfd				last;
+	int					count;
 
 public:
 	struct InvalidFdsCount : std::exception { virtual const char* what(void) const throw() { return ("Invalid count of fds."); }};

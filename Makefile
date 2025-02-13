@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+         #
+#    By: bama <bama@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/13 16:21:19 by ymanchon          #+#    #+#              #
-#    Updated: 2025/02/12 20:48:29 by ymanchon         ###   ########.fr        #
+#    Updated: 2025/02/13 02:04:56 by bama             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,6 +37,7 @@ CXX = @c++
 SRCS =	./src/Irc.cpp \
 		./src/Socket.cpp \
 		./src/Poll.cpp \
+		./src/FControl.cpp \
 		./main.cpp
 
 OBJS_DIR = objs
@@ -45,9 +46,9 @@ OBJS = $(SRCS:%.cpp=$(OBJS_DIR)/%.obj)
 
 DEPS = $(OBJS:%.obj=%.d)
 
-INCLUDES = -I. -I./includes/
+INCLUDES = -I. -I./includes/ -I./inline/
 
-CFLAGS = -std=c++98 -Wall -Wextra -MMD #-Werror
+CFLAGS = -std=c++98 -Wall -Wextra -MMD -fPIE #-Werror
 
 # ############## #
 #*    REGLES    *#

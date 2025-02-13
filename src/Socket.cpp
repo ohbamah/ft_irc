@@ -3,20 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/12 21:19:16 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/13 02:47:36 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Socket.hpp"
 
-Socket::Socket(void) : bound(false), connected(false), client(true), com(-1), fd(-1)
+Socket::Socket(void) : bound(false), connected(false), client(true), listener(false), com(-1), fd(-1)
 {
 }
 
-Socket::Socket(int af, int type, int prot) : bound(false), connected(false), client(false), com(-1)
+Socket::Socket(int af, int type, int prot) : bound(false), connected(false), client(false), listener(false), com(-1)
 {
 	this->fd = socket(af, type, prot);
 	if (this->fd == -1)
@@ -29,11 +29,33 @@ Socket::~Socket()
 	this->Close();
 }
 
-SocketInstance
-Socket::Accept()
+void
+Socket::SetOptions(int flags)
+{
+	bool	active = true;
+	setsockopt(this->fd, SOL_SOCKET, flags, &active, sizeof(active));
+}
+
+void
+Socket::Listen(void)
+{
+	if (!this->listener)
+	{
+		if (!this->bound)
+			throw (Socket::IsNotAServer());
+		if (listen(this->fd, SOMAXCONN) == -1)
+			throw (Socket::CantListen());
+		this->listener = true;
+	}
+}
+
+SocketRemote
+Socket::Accept(void)
 {
 	if (!this->bound)
 		throw (Socket::IsNotAServer());
+	if (!this->listener)
+		throw (Socket::IsNotListening());
 	sockaddr_in	saddr;
 	socklen_t	saddr_len = 0;
 	int			client_fd;
@@ -43,10 +65,10 @@ Socket::Accept()
 		throw (Socket::CantAccept());
 
 	char			clientIp[INET_ADDRSTRLEN];
-	SocketInstance	si(client_fd);
+	SocketRemote	sr(client_fd);
 	inet_ntop(Socket::AddrFamily::IPv4, &saddr.sin_addr, clientIp, INET_ADDRSTRLEN);
-	si.SetInfo(std::string(clientIp).c_str(), ntohs(saddr.sin_port));
-	return (si);
+	sr.SetInfo(std::string(clientIp).c_str(), ntohs(saddr.sin_port));
+	return (sr);
 }
 
 void
@@ -110,17 +132,23 @@ Socket::Get(void) const
 	return (this->fd);
 }
 
-SocketInstance::SocketInstance(int fd) : Socket()
+int
+SocketRemote::Get(void)
+{
+	return (this->fd);
+}
+
+SocketRemote::SocketRemote(int fd) : Socket()
 {
 	this->com = fd;
 }
 
-SocketInstance::~SocketInstance()
+SocketRemote::~SocketRemote()
 {
 }
 
 void
-SocketInstance::SetInfo(const char* addr, int port)
+SocketRemote::SetInfo(const char* addr, int port)
 {
 	this->info.address = addr;
 	this->info.port = port;
