@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Irc.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:25:43 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/13 02:37:01 by bama             ###   ########.fr       */
+/*   Updated: 2025/02/13 17:27:39 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,8 @@ public:
 private:
 	Poll						ircPoll;
 	Socket						server;
-	std::vector<SocketRemote>	clients;
+	std::vector<SocketRemote*>	clients;
+	std::vector<pollfd>			polls;
 };
 
 #endif

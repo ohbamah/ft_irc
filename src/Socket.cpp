@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/13 02:47:36 by bama             ###   ########.fr       */
+/*   Updated: 2025/02/13 16:55:05 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ Socket::Socket(int af, int type, int prot) : bound(false), connected(false), cli
 	if (this->fd == -1)
 		throw (Socket::FailedToCreate());
 	this->info.address = NULL;
+	this->info.port = 0;
 }
 
 Socket::~Socket()
@@ -49,7 +50,7 @@ Socket::Listen(void)
 	}
 }
 
-SocketRemote
+SocketRemote*
 Socket::Accept(void)
 {
 	if (!this->bound)
@@ -65,9 +66,9 @@ Socket::Accept(void)
 		throw (Socket::CantAccept());
 
 	char			clientIp[INET_ADDRSTRLEN];
-	SocketRemote	sr(client_fd);
+	SocketRemote*		sr = new SocketRemote(client_fd);
 	inet_ntop(Socket::AddrFamily::IPv4, &saddr.sin_addr, clientIp, INET_ADDRSTRLEN);
-	sr.SetInfo(std::string(clientIp).c_str(), ntohs(saddr.sin_port));
+	sr->SetInfo(std::string(clientIp).c_str(), ntohs(saddr.sin_port));
 	return (sr);
 }
 
@@ -108,8 +109,8 @@ Socket::Bind(int port)
 		saddr.sin_family = Socket::AddrFamily::IPv4;
 		saddr.sin_addr.s_addr = INADDR_ANY;
 		saddr.sin_port = htons(port);
-			if (bind(this->fd, reinterpret_cast<const sockaddr*>(&saddr), sizeof(saddr)) == -1)
-		throw (Socket::ImpossibleToBind());
+		if (bind(this->fd, reinterpret_cast<const sockaddr*>(&saddr), sizeof(saddr)) == -1)
+			throw (Socket::ImpossibleToBind());
 		this->info.port = port;
 		this->bound = true;
 	}

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: bama <bama@student.42.fr>                  +#+  +:+       +#+         #
+#    By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/13 16:21:19 by ymanchon          #+#    #+#              #
-#    Updated: 2025/02/13 02:04:56 by bama             ###   ########.fr        #
+#    Updated: 2025/02/13 18:09:51 by ymanchon         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -48,7 +48,7 @@ DEPS = $(OBJS:%.obj=%.d)
 
 INCLUDES = -I. -I./includes/ -I./inline/
 
-CFLAGS = -std=c++98 -Wall -Wextra -MMD -fPIE #-Werror
+CFLAGS = -std=c++98 -Wall -Wextra -MMD -fPIE -g3 #-Werror
 
 # ############## #
 #*    REGLES    *#

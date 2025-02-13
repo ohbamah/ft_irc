@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/13 02:47:23 by bama             ###   ########.fr       */
+/*   Updated: 2025/02/13 16:55:14 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include <unistd.h>
 # include <cstring>
 # include <string>
+# include "Ptr.hpp"
 
 struct SocketInfo
 {
@@ -47,7 +48,7 @@ public:
 	SetOptions(int flags);
 	void
 	Listen(void);
-	SocketRemote
+	SocketRemote*
 	Accept(void);
 	void
 	Connect(const Socket& socket, const char *address, int port);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Poll.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/13 02:51:22 by bama             ###   ########.fr       */
+/*   Updated: 2025/02/13 18:19:16 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,113 +14,114 @@
 
 	/* PUBLIC */
 
-Poll::Poll(int* pfds, int pcount)
+Poll::Poll(Str* names, int* pfds, int pcount, int reqv)
 {
 	if (pcount <= 0 || !pfds)
 		throw (Poll::InvalidFdsCount());
-	this->count = pcount;
-	this->pollfds.reserve(pcount);
 
-	for (int i = 0 ; i < this->count ; ++i)
+	for (int i = 0 ; i < pcount ; ++i)
 	{
-		this->pollfds[i].events = 0;
-		this->pollfds[i].revents = 0;
-		this->pollfds[i].fd = pfds[i];
+		this->pollfds[names[i]].events = reqv;
+		this->pollfds[names[i]].revents = 0;
+		this->pollfds[names[i]].fd = pfds[i];
 	}
-	this->last = this->pollfds[0];
+	this->last = this->pollfds.find(names[0])->second;
 }
 
 Poll::~Poll()
 {
 }
 
-int
-Poll::Check(int ptimeout)
+std::vector<pollfd>
+Poll::Test(void)
 {
-	return (poll(&this->pollfds[0], this->count, ptimeout));
+	std::vector<pollfd>				ret;
+	std::map<Str, pollfd>::iterator it;
+
+	for (it = this->pollfds.begin(); it != this->pollfds.end(); ++it)
+		ret.push_back(it->second);
+	return (ret);
+}
+
+int
+Poll::Events(int ptimeout)
+{
+	std::vector<pollfd>	feur = Test();
+	return (poll(&feur[0], feur.size(), ptimeout));
 }
 
 void
-Poll::AddFd(int fd)
+Poll::AddFd(Str name, int fd, int reqv)
 {
 	pollfd	tmp;
 
 	tmp.fd = fd;
-	tmp.events = 0;
+	tmp.events = reqv;
 	tmp.revents = 0;
-	this->pollfds.push_back(tmp);
-	++this->count;
+	this->pollfds[name] = tmp;
+	this->last = tmp;
 }
 
 bool
-Poll::ReadRequest(int fd)
+Poll::ReadRequest(Str name)
 {
-	if (fd != this->last.fd)
-		this->FindCorrectFd(fd);
+	this->last = this->pollfds.find(name)->second;
 	return (this->last.revents & POLLIN);
 }
 
 bool
-Poll::NormalReadRequest(int fd)
+Poll::NormalReadRequest(Str name)
 {
-	if (fd != this->last.fd)
-		this->FindCorrectFd(fd);
+	this->last = this->pollfds.find(name)->second;
 	return (this->last.revents & POLLRDNORM);
 }
 
 bool
-Poll::PriReadRequest(int fd)
+Poll::PriReadRequest(Str name)
 {
-	if (fd != this->last.fd)
-		this->FindCorrectFd(fd);
+	this->last = this->pollfds.find(name)->second;
 	return (this->last.revents & POLLRDBAND);
 }
 
 bool
-Poll::HighPriReadRequest(int fd)
+Poll::HighPriReadRequest(Str name)
 {
-	if (fd != this->last.fd)
-		this->FindCorrectFd(fd);
+	this->last = this->pollfds.find(name)->second;
 	return (this->last.revents & POLLPRI);
 }
 
 bool
-Poll::WriteRequest(int fd)
+Poll::WriteRequest(Str name)
 {
-	if (fd != this->last.fd)
-		this->FindCorrectFd(fd);
+	this->last = this->pollfds.find(name)->second;
 	return (this->last.revents & (POLLOUT|POLLWRNORM));
 }
 
 bool
-Poll::PriWriteRequest(int fd)
+Poll::PriWriteRequest(Str name)
 {
-	if (fd != this->last.fd)
-		this->FindCorrectFd(fd);
+	this->last = this->pollfds.find(name)->second;
 	return (this->last.revents & POLLWRBAND);
 }
 
 bool
-Poll::HupRequest(int fd)
+Poll::HupRequest(Str name)
 {
-	if (fd != this->last.fd)
-		this->FindCorrectFd(fd);
+	this->last = this->pollfds.find(name)->second;
 	return (this->last.revents & POLLHUP);
 }
 
 bool
-Poll::IsErrorAppear(int fd)
+Poll::IsErrorAppear(Str name)
 {
-	if (fd != this->last.fd)
-		this->FindCorrectFd(fd);
+	this->last = this->pollfds.find(name)->second;
 	return (this->last.revents & POLLERR);
 }
 
 bool
-Poll::IsInvalidFd(int fd)
+Poll::IsInvalidFd(Str name)
 {
-	if (fd != this->last.fd)
-		this->FindCorrectFd(fd);
+	this->last = this->pollfds.find(name)->second;
 	return (this->last.revents & POLLNVAL);
 }
 
@@ -137,9 +138,9 @@ Poll::Poll(const Poll&)
 void
 Poll::FindCorrectFd(int fd)
 {
-	int	i = 0;
-	while(i < count && fd != this->pollfds[i].fd)
-		++i;
-	if (i != count)
-		this->last = this->pollfds[i];
+	//unsigned long	i = 0;
+	//while(i < this->pollfds.size() && fd != this->pollfds[i].fd)
+	//	++i;
+	//if (i != this->pollfds.size())
+	//	this->last = this->pollfds[i];
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Poll.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/13 02:43:35 by bama             ###   ########.fr       */
+/*   Updated: 2025/02/13 18:11:20 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,46 +16,50 @@
 # include <poll.h>
 # include <exception>
 # include <vector>
+# include <map>
+# include <string>
+
+typedef std::string	Str;
 
 class Poll
 {
 public:
 	Poll(void);
-	Poll(int pfds[], int pcount);
+	Poll(Str names[], int pfds[], int pcount, int reqv = Poll::AllReq);
 	~Poll();
 
 	int
-	Check(int timeout);
+	Events(int timeout);
 
 	void
-	AddFd(int fd);
+	AddFd(Str name, int fd, int reqv = Poll::AllReq);
 
 	bool
-	ReadRequest(int fd);
+	ReadRequest(Str name);
 
 	bool
-	NormalReadRequest(int fd);
+	NormalReadRequest(Str name);
 
 	bool
-	PriReadRequest(int fd);
+	PriReadRequest(Str name);
 
 	bool
-	HighPriReadRequest(int fd);
+	HighPriReadRequest(Str name);
 
 	bool
-	WriteRequest(int fd);
+	WriteRequest(Str name);
 
 	bool
-	PriWriteRequest(int fd);
+	PriWriteRequest(Str name);
 
 	bool
-	HupRequest(int fd);
+	HupRequest(Str name);
 
 	bool
-	IsErrorAppear(int fd);
+	IsErrorAppear(Str name);
 
 	bool
-	IsInvalidFd(int fd);
+	IsInvalidFd(Str name);
 
 private:
 	Poll(const Poll&);
@@ -63,13 +67,25 @@ private:
 	void
 	FindCorrectFd(int fd);
 
+	std::vector<pollfd>
+	Test(void);
+
 private:
-	std::vector<pollfd>	pollfds;
-	pollfd				last;
-	int					count;
+	std::map<Str, pollfd>	pollfds;
+	pollfd					last;
 
 public:
 	struct InvalidFdsCount : std::exception { virtual const char* what(void) const throw() { return ("Invalid count of fds."); }};
+
+public:
+	enum
+	{
+		AllReq		= POLLIN | POLLOUT | POLLHUP | POLLRDNORM | POLLRDBAND | POLLPRI | POLLWRNORM | POLLWRBAND | POLLERR | POLLNVAL,
+		ReadReq		= POLLIN | POLLRDNORM | POLLRDBAND | POLLPRI,
+		WriteReq	= POLLOUT | POLLWRNORM | POLLWRBAND,
+		ErrorReq	= POLLERR | POLLNVAL,
+		ExitReq		= POLLHUP
+	};
 };
 
 #endif
