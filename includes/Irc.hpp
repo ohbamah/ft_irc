@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:25:43 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/13 17:27:39 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/14 15:06:15 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <sys/stat.h>
 # include <cstdlib>
 # include <vector>
+#include <sstream>
 #include "Poll.hpp"
 #include "Socket.hpp"
 #include "FControl.hpp"

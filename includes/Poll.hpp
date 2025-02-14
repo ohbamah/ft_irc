@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/13 18:11:20 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/14 16:13:03 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,14 @@ class Poll
 {
 public:
 	Poll(void);
-	Poll(Str names[], int pfds[], int pcount, int reqv = Poll::AllReq);
+	Poll(Str names[], int pfds[], int pcount, short reqv = Poll::AllReq);
 	~Poll();
 
 	int
 	Events(int timeout);
 
 	void
-	AddFd(Str name, int fd, int reqv = Poll::AllReq);
+	AddFd(Str name, int fd, short reqv = Poll::AllReq);
 
 	bool
 	ReadRequest(Str name);
@@ -61,21 +61,23 @@ public:
 	bool
 	IsInvalidFd(Str name);
 
-private:
+public:
 	Poll(const Poll&);
 
 	void
 	FindCorrectFd(int fd);
 
-	std::vector<pollfd>
-	Test(void);
+	pollfd*
+	SearchPFD(const Str& name);
 
-private:
-	std::map<Str, pollfd>	pollfds;
-	pollfd					last;
+public:
+	std::vector<Str>		names;
+	std::vector<pollfd>		pfd;
+	pollfd*					last;
 
 public:
 	struct InvalidFdsCount : std::exception { virtual const char* what(void) const throw() { return ("Invalid count of fds."); }};
+	struct NameIDDoesntExist : std::exception { virtual const char* what(void) const throw() { return ("Name ID does not exist."); }};
 
 public:
 	enum
@@ -83,6 +85,7 @@ public:
 		AllReq		= POLLIN | POLLOUT | POLLHUP | POLLRDNORM | POLLRDBAND | POLLPRI | POLLWRNORM | POLLWRBAND | POLLERR | POLLNVAL,
 		ReadReq		= POLLIN | POLLRDNORM | POLLRDBAND | POLLPRI,
 		WriteReq	= POLLOUT | POLLWRNORM | POLLWRBAND,
+		RdWrReq		= Poll::ReadReq | Poll::WriteReq,
 		ErrorReq	= POLLERR | POLLNVAL,
 		ExitReq		= POLLHUP
 	};

@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/13 16:55:05 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/14 15:36:53 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,8 @@ Socket::Connect(const Socket& socket, const char *address, int port)
 	}
 }
 
+#include <errno.h>
+#include <stdlib.h>
 void
 Socket::Bind(int port)
 {

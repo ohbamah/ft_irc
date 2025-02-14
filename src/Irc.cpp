@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/13 18:08:01 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/14 20:10:42 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,18 @@
 
 Irc::Irc(int port, const char* pass) : server(Socket::AddrFamily::IPv4, Socket::Type::TCP, Socket::Protocol::Auto)
 {
+	this->server.SetOptions(SO_REUSEADDR | SO_REUSEPORT);
 	this->server.Bind(port);
 	this->server.Listen();
-	this->server.SetOptions(SO_REUSEADDR);
 
-	this->ircPoll.AddFd("server", this->server.Get(), POLLIN);
 	FControl::SetFlags(this->server.Get(), FControl::NonBlock);
-	//pollfd	pfd;
-	//pfd.events = POLLIN;
-	//pfd.revents = 0;
-	//pfd.fd = this->server.Get();
-	//polls.push_back(pfd);
+	this->ircPoll.AddFd("server", this->server.Get(), Poll::ReadReq);
 	while (1)
 	{
 		this->ircPoll.Events(0);
-		//this->ircPoll.Check(0);
-		//poll(&pfd, 1, 0);
-		//if (pfd.revents & POLLIN)
+		this->RecvMessage();
 		if (this->ircPoll.ReadRequest("server"))
 			this->AcceptConnexion();
-		//if (pfd.revents & POLLIN)
-		this->RecvMessage();
 	}
 }
 
@@ -49,14 +40,12 @@ Irc::AcceptConnexion(void)
 {
 	try
 	{
-		//std::cout << "feur\n";
-		//if (this->ircPoll.ReadRequest(this->server.Get()))
-		//{
-
-			std::cout << "Connexion..." << std::endl;
-			this->clients.push_back(this->server.Accept());
-			std::cout << "Connexion detected and accepted!" << std::endl;
-		//}
+		std::cout << "Connexion..." << std::endl;
+		std::stringstream	itos;
+		itos << this->clients.size();
+		this->clients.push_back(this->server.Accept());
+		this->ircPoll.AddFd("client" + itos.str(), (*(this->clients.end() - 1))->Get(), POLLIN);
+		std::cout << "Connexion detected and accepted!" << std::endl;
 	}
 	catch (...)
 	{
@@ -66,16 +55,19 @@ Irc::AcceptConnexion(void)
 void
 Irc::RecvMessage(void)
 {
-	char	message[512];
+	char	message[512] = {0};
 
 	for (unsigned long i = 0 ; i < this->clients.size() ; ++i)
 	{
 		try
 		{
-			//if (this->ircPoll.ReadRequest(this->clients[i]->Get()))
+			//std::cout << "client" << i << std::endl;
+			std::stringstream	itos;
+			itos << i;
+			//if (this->ircPoll.ReadRequest("client" + itos.str()))
 			//{
-			//	this->clients[i]->Recv(message);
-			//	std::cout << message << std::endl;
+				std::cout << this->clients[i]->Recv(message);
+				std::cout << message << std::endl;
 			//}
 		}
 		catch (Socket::FailedRecv& e)
