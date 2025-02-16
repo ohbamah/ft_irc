@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:25:43 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/14 15:06:15 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/16 19:28:27 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,12 @@
 # include <sys/stat.h>
 # include <cstdlib>
 # include <vector>
-#include <sstream>
-#include "Poll.hpp"
-#include "Socket.hpp"
-#include "FControl.hpp"
+# include <sstream>
+# include "Poll.hpp"
+# include "Server.hpp"
+# include "FControl.hpp"
+# include "Req.hpp"
+# include "Channel.hpp"
 
 class Irc
 {
@@ -30,6 +32,8 @@ public:
 	~Irc();
 
 	void
+	HandleClientConnexion(Client* local);
+	void
 	AcceptConnexion(void);
 	void
 	RecvMessage(void);
@@ -37,10 +41,10 @@ public:
 	SendMessage(void);
 
 private:
-	Poll						ircPoll;
-	Socket						server;
-	std::vector<SocketRemote*>	clients;
-	std::vector<pollfd>			polls;
+	Poll					event;
+	Server					server;
+	std::vector<Channel>	channels;
+	std::vector<pollfd>		polls;
 };
 
 #endif

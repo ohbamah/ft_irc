@@ -6,7 +6,7 @@
 #    By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/13 16:21:19 by ymanchon          #+#    #+#              #
-#    Updated: 2025/02/13 18:09:51 by ymanchon         ###   ########.fr        #
+#    Updated: 2025/02/16 18:12:23 by ymanchon         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -38,6 +38,10 @@ SRCS =	./src/Irc.cpp \
 		./src/Socket.cpp \
 		./src/Poll.cpp \
 		./src/FControl.cpp \
+		./src/Client.cpp \
+		./src/Server.cpp \
+		./src/Req.cpp \
+		./src/Channel.cpp \
 		./main.cpp
 
 OBJS_DIR = objs

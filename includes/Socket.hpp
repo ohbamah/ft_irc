@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/13 16:55:14 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/16 19:26:12 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,9 @@ public:
 	template <typename T>
 	int
 	Recv(T& data, int nbytes = sizeof(T));
+	template <typename T>
+	int
+	Recv(T* data, int nbytes);
 	template <typename T>
 	int
 	Send(const T& data, int nbytes = sizeof(T));
@@ -179,6 +182,9 @@ public:
 	template <typename T>
 	int
 	Recv(T& data, int nbytes = sizeof(T));
+	template <typename T>
+	int
+	Recv(T* data, int nbytes);
 	template <typename T>
 	int
 	Send(const T& data, int nbytes = sizeof(T));

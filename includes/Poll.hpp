@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/14 16:13:03 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/16 18:41:21 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <vector>
 # include <map>
 # include <string>
+# include <algorithm>
 
 typedef std::string	Str;
 
@@ -32,45 +33,45 @@ public:
 	Events(int timeout);
 
 	void
-	AddFd(Str name, int fd, short reqv = Poll::AllReq);
+	AddFd(const Str& name, int fd, short reqv = Poll::AllReq);
 
 	bool
-	ReadRequest(Str name);
+	ReadRequest(const Str& name);
 
 	bool
-	NormalReadRequest(Str name);
+	NormalReadRequest(const Str& name);
 
 	bool
-	PriReadRequest(Str name);
+	PriReadRequest(const Str& name);
 
 	bool
-	HighPriReadRequest(Str name);
+	HighPriReadRequest(const Str& name);
 
 	bool
-	WriteRequest(Str name);
+	WriteRequest(const Str& name);
 
 	bool
-	PriWriteRequest(Str name);
+	PriWriteRequest(const Str& name);
 
 	bool
-	HupRequest(Str name);
+	HupRequest(const Str& name);
 
 	bool
-	IsErrorAppear(Str name);
+	IsErrorAppear(const Str& name);
 
 	bool
-	IsInvalidFd(Str name);
-
-public:
-	Poll(const Poll&);
+	IsInvalidFd(const Str& name);
 
 	void
-	FindCorrectFd(int fd);
+	ChangePollName(const Str& oldname, const Str& newname);
+
+private:
+	Poll(const Poll&);
 
 	pollfd*
 	SearchPFD(const Str& name);
 
-public:
+private:
 	std::vector<Str>		names;
 	std::vector<pollfd>		pfd;
 	pollfd*					last;

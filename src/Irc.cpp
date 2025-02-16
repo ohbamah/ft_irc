@@ -6,33 +6,39 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/14 20:10:42 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/16 19:30:32 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Irc.hpp"
 
-Irc::Irc(int port, const char* pass) : server(Socket::AddrFamily::IPv4, Socket::Type::TCP, Socket::Protocol::Auto)
+Irc::Irc(int port, const char* pass) : server(port)
 {
-	this->server.SetOptions(SO_REUSEADDR | SO_REUSEPORT);
-	this->server.Bind(port);
 	this->server.Listen();
 
 	FControl::SetFlags(this->server.Get(), FControl::NonBlock);
-	this->ircPoll.AddFd("server", this->server.Get(), Poll::ReadReq);
+	this->event.AddFd("server", this->server.Get(), Poll::ReadReq);
 	while (1)
 	{
-		this->ircPoll.Events(0);
+		this->event.Events(0);
 		this->RecvMessage();
-		if (this->ircPoll.ReadRequest("server"))
+		if (this->event.ReadRequest("server"))
 			this->AcceptConnexion();
 	}
 }
 
 Irc::~Irc()
 {
-	for (unsigned long i = 0 ; i < this->clients.size() ; ++i)
-		delete(this->clients[i]);
+	for (unsigned long i = 0 ; i < this->server.RefClients().size() ; ++i)
+		delete(this->server.RefClients()[i]);
+}
+
+void
+Irc::HandleClientConnexion(Client* local)
+{
+	char	message[512];
+	local->GetRemote()->Recv(message);
+	Req::Check(this->server, this->channels, local, message);
 }
 
 void
@@ -40,35 +46,42 @@ Irc::AcceptConnexion(void)
 {
 	try
 	{
-		std::cout << "Connexion..." << std::endl;
+		std::cout << "\e[34mConnexion...\e[0m" << std::endl;
 		std::stringstream	itos;
-		itos << this->clients.size();
-		this->clients.push_back(this->server.Accept());
-		this->ircPoll.AddFd("client" + itos.str(), (*(this->clients.end() - 1))->Get(), POLLIN);
-		std::cout << "Connexion detected and accepted!" << std::endl;
+		Str					nickname;
+		itos << "client" << this->server.RefClients().size();
+
+		this->server.Accept(itos.str());
+		Client*	localClient = this->server.FindClientByName(itos.str());
+
+		this->HandleClientConnexion(localClient);
+		nickname = localClient->GetNick();
+		this->event.AddFd(nickname, localClient->GetRemote()->Get(), Poll::WriteReq);
+
+		std::cout << "\e[32m" << nickname << " is successfuly connected!\e[0m" << std::endl;
 	}
 	catch (...)
 	{
+		std::cout << "\e[31mConnexion echouee...\e[0m" << std::endl;
 	}
 }
 
 void
 Irc::RecvMessage(void)
 {
-	char	message[512] = {0};
+	char	message[512];
 
-	for (unsigned long i = 0 ; i < this->clients.size() ; ++i)
+	for (unsigned long i = 0 ; i < this->server.RefClients().size() ; ++i)
 	{
 		try
 		{
-			//std::cout << "client" << i << std::endl;
 			std::stringstream	itos;
 			itos << i;
-			//if (this->ircPoll.ReadRequest("client" + itos.str()))
-			//{
-				std::cout << this->clients[i]->Recv(message);
+			if (this->event.WriteRequest(this->server.RefClients()[i]->GetName()))
+			{
+				this->server.RecvFrom(i, message, 512);
 				std::cout << message << std::endl;
-			//}
+			}
 		}
 		catch (Socket::FailedRecv& e)
 		{
