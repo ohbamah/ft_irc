@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:25:43 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 15:34:29 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 17:29:49 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ public:
 	HandleClients(void);
 	void
 	SendMessage(void);
+	void
+	DisconnectAnyone(Client* c);
 
 private:
 	//Poll					event;

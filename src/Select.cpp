@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 15:18:49 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 17:20:53 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 17:34:24 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,36 +102,45 @@ void
 Select::RemoveWriteReq(int fd)
 {
 	std::vector<int>::iterator	it = std::find(this->wrfd.begin(), this->wrfd.end(), fd);
-	this->wrfd.erase(it);
-	this->__ResetSets();
-	if (this->wrfd.size() == 0)
-		this->max_fd = 0;
-	else
-		this->max_fd = *std::max_element(this->wrfd.begin(), this->wrfd.end());
+	if (it != this->wrfd.end())
+	{
+		this->wrfd.erase(it);
+		this->__ResetSets();
+		if (this->wrfd.size() == 0)
+			this->max_fd = 0;
+		else
+			this->max_fd = *std::max_element(this->wrfd.begin(), this->wrfd.end());
+	}
 }
 
 void
 Select::RemoveReadReq(int fd)
 {
 	std::vector<int>::iterator	it = std::find(this->rdfd.begin(), this->rdfd.end(), fd);
-	this->rdfd.erase(it);
-	this->__ResetSets();
-	if (this->rdfd.size() == 0)
-		this->max_fd = 0;
-	else if (this->max_fd == fd)
-		this->max_fd = *std::max_element(this->rdfd.begin(), this->rdfd.end());
+	if (it != this->rdfd.end())
+	{
+		this->rdfd.erase(it);
+		this->__ResetSets();
+		if (this->rdfd.size() == 0)
+			this->max_fd = 0;
+		else if (this->max_fd == fd)
+			this->max_fd = *std::max_element(this->rdfd.begin(), this->rdfd.end());
+	}
 }
 
 void
 Select::RemoveExcpReq(int fd)
 {
 	std::vector<int>::iterator	it = std::find(this->exfd.begin(), this->exfd.end(), fd);
-	this->exfd.erase(it);
-	this->__ResetSets();
-	if (this->exfd.size() == 0)
-		this->max_fd = 0;
-	else if (this->max_fd == fd)
-		this->max_fd = *std::max_element(this->exfd.begin(), this->exfd.end());
+	if (it != this->exfd.end())
+	{
+		this->exfd.erase(it);
+		this->__ResetSets();
+		if (this->exfd.size() == 0)
+			this->max_fd = 0;
+		else if (this->max_fd == fd)
+			this->max_fd = *std::max_element(this->exfd.begin(), this->exfd.end());
+	}
 }
 
 void

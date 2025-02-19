@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 17:21:16 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 17:35:41 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ Irc::HandleClients(void)
 {
 	char	message[512];
 
-	for (unsigned long i = 0 ; i < this->server.RefClients().size() ; ++i)
+	for (long i = 0 ; (unsigned long)i < this->server.RefClients().size() ; ++i)
 	{
 		try
 		{
@@ -78,13 +78,17 @@ Irc::HandleClients(void)
 			int clientFd = this->server.RefClients()[i]->GetRemote()->Get();
 			if (this->sync.Exception(clientFd))
 			{
-				// del client* in std::vector of this->channels
-				this->server.Disconnect(this->server.RefClients()[i]);
-				std::cout << "POLLHUP\n";
+				this->DisconnectAnyone(this->server.RefClients()[i]);
+				i = -1;
 			}
 			else if (this->sync.CanRead(clientFd))
 			{
-				this->server.RecvFrom(i, message, 512);
+				if (this->server.RecvFrom(i, message, 512) <= 0)
+				{
+					this->DisconnectAnyone(this->server.RefClients()[i]);
+					i = -1;
+					std::exit(0);
+				}
 				std::cout << message << std::endl;
 			}
 		}
@@ -98,4 +102,17 @@ void
 Irc::SendMessage(void)
 {
 	
+}
+
+void
+Irc::DisconnectAnyone(Client* c)
+{
+	int clientFd = c->GetRemote()->Get();
+
+	this->sync.RemoveExcpReq(clientFd);
+	this->sync.RemoveReadReq(clientFd);
+	this->sync.RemoveWriteReq(clientFd);
+	for (unsigned long i = 0 ; i < this->channels.size() ; ++i)
+		this->channels[i].Disconnect(c);
+	this->server.Disconnect(c);
 }

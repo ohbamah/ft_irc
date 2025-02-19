@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:34:32 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/16 19:20:02 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 17:25:23 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,12 @@ Channel::Channel(const Channel::Str& pName, const Str& pPass) : name(pName), pas
 
 Channel::~Channel()
 {
+}
+
+void
+Channel::Disconnect(Client* c)
+{
+	this->KickUser(c);
 }
 
 void
@@ -59,11 +65,20 @@ Channel::RevokeUser(Client* c)
 	else
 		throw (Channel::UserNotFound());
 }
+
 void
 Channel::KickUser(Client* c)
 {
-	
+	std::vector<Client*>::iterator	it;
+
+	it = std::find(this->users.begin(), this->users.end(), c);
+	if (it != this->users.end())
+		this->users.erase(it);
+	it = std::find(this->admin.begin(), this->admin.end(), c);
+	if (it != this->admin.end())
+		this->admin.erase(it);
 }
+
 void
 Channel::InviteUser(Client* c)
 {

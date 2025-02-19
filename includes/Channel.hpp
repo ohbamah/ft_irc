@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:26:14 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/16 19:20:09 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 17:23:32 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,8 @@ public:
 	Channel(const Str& name, const Str& pass);
 	~Channel();
 
+	void
+	Disconnect(Client* c);
 	void
 	AddUser(Client* c);
 	void
