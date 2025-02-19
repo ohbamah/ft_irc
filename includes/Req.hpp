@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:33:17 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/16 19:17:53 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:31:01 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@
 # define REQ_DATA	server, channels, client, req
 # define UNUSED_REQ_PARAMS	(void)server; (void)channels, (void)client; (void)req;
 # define REQ_COUNT	9
+
+typedef std::string Str;
 
 namespace Req
 {

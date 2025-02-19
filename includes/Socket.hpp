@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/16 19:26:12 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:44:55 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 # include <unistd.h>
 # include <cstring>
 # include <string>
-# include "Ptr.hpp"
 
 struct SocketInfo
 {
@@ -71,6 +70,7 @@ protected:
 	bool		connected;
 	bool		client;
 	bool		listener;
+	bool		closed;
 	int			com;	// the communication fd
 	int			fd;
 
@@ -174,6 +174,8 @@ public:
 	SocketRemote(int fd);
 	virtual ~SocketRemote();
 
+	void
+	Close(void);
 	void
 	SetInfo(const char* addr, int port);
 	int

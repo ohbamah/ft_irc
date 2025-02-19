@@ -6,17 +6,17 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/14 15:36:53 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:45:43 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Socket.hpp"
 
-Socket::Socket(void) : bound(false), connected(false), client(true), listener(false), com(-1), fd(-1)
+Socket::Socket(void) : bound(false), connected(false), client(true), listener(false), closed(true), com(-1), fd(-1)
 {
 }
 
-Socket::Socket(int af, int type, int prot) : bound(false), connected(false), client(false), listener(false), com(-1)
+Socket::Socket(int af, int type, int prot) : bound(false), connected(false), client(false), closed(false), listener(false), com(-1)
 {
 	this->fd = socket(af, type, prot);
 	if (this->fd == -1)
@@ -127,6 +127,7 @@ Socket::Close(void)
 		close(this->com);
 	this->fd = -1;
 	this->com = -1;
+	this->closed = true;
 }
 
 const int&
@@ -148,6 +149,12 @@ SocketRemote::SocketRemote(int fd) : Socket()
 
 SocketRemote::~SocketRemote()
 {
+}
+
+void
+SocketRemote::Close(void)
+{
+	this->Socket::Close();
 }
 
 void

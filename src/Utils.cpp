@@ -1,34 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Ptr.hpp                                            :+:      :+:    :+:   */
+/*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/13 16:44:40 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/14 15:06:08 by ymanchon         ###   ########.fr       */
+/*   Created: 2025/02/19 14:21:42 by ymanchon          #+#    #+#             */
+/*   Updated: 2025/02/19 14:26:46 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PTR_HPP
-#define PTR_HPP
+#include "Utils.hpp"
 
-template <typename T>
-class Ptr
+pollfd
+Utils::CreatePollfd(int fd, int eventToTarget)
 {
-public:
-	Ptr(void);
-	Ptr(T);
-	Ptr(T*);
-	~Ptr();
+	pollfd	ret;
 
-	T*	operator*(void);
-	T*	operator->(void);
+	ret.events = eventToTarget;
+	ret.fd = fd;
+	ret.revents = 0;
+	return (ret);
+}
 
-private:
-	T*	raw;
-};
-
-# include "Ptr.inl"
-
-#endif
+const pollfd&
+Utils::SearchPollfd(const std::vector<pollfd>& pfd, const int& fdTargeted)
+{
+	for (unsigned long i = 0 ; i < pfd.size() ; ++i)
+		if (pfd[i].fd == fdTargeted)
+			return (pfd[i]);
+	throw (NonExistingPollfd());
+}

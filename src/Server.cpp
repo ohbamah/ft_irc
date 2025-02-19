@@ -6,18 +6,18 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/16 17:42:48 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:48:38 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "FControl.hpp"
 
-Server::Server(int port) : Socket(Socket::AddrFamily::IPv4, Socket::Type::TCP, Socket::Protocol::Auto)
+Server::Server(int port, int pFControlFlags) : Socket(Socket::AddrFamily::IPv4, Socket::Type::TCP, Socket::Protocol::Auto)
 {
 	this->Socket::SetOptions(SO_REUSEADDR | SO_REUSEPORT);
 	this->Socket::Bind(port);
-	FControl::SetFlags(this->Socket::Get(), FControl::NonBlock);
+	FControl::SetFlags(this->Socket::Get(), pFControlFlags);
 }
 
 Server::~Server()
@@ -34,6 +34,16 @@ std::vector<Client*>&
 Server::RefClients(void)
 {
 	return (this->clients);
+}
+
+void
+Server::Disconnect(const Client* ptr)
+{
+	std::vector<Client*>::iterator	it = std::find(this->clients.begin(), this->clients.end(), ptr);
+	Client*	client = (*it);
+	this->clients.erase(it);
+	client->GetRemote()->Close();
+	delete (client);
 }
 
 void

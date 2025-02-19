@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:28:02 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/16 19:14:49 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:49:16 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,12 @@ SocketRemote*
 Client::GetRemote(void) const
 {
 	return (this->remote);
+}
+
+void
+Client::Disconnect(void)
+{
+	this->GetRemote()->Close();
 }
 
 void

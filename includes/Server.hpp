@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:35:20 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/16 17:42:41 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:40:48 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,14 @@
 
 # include "Client.hpp"
 # include <vector>
+# include <algorithm>
 
 class Server : private Socket
 {
 	typedef std::string	Str;
 
 public:
-	Server(int port);
+	Server(int port, int pFControlFlags);
 	~Server();
 
 	const int&
@@ -29,6 +30,8 @@ public:
 	std::vector<Client*>&
 	RefClients(void);
 
+	void
+	Disconnect(const Client* ptr);
 	void
 	Accept(const Str& clientName);
 	void
