@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 15:13:25 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 17:20:23 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,7 @@ Socket::Get(void) const
 int
 SocketRemote::Get(void)
 {
-	return (this->fd);
+	return (this->com);
 }
 
 SocketRemote::SocketRemote(int fd) : Socket()

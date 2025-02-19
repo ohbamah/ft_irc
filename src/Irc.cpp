@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 16:00:15 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 17:21:16 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ Irc::AcceptConnexion(void)
 	{
 		std::cout << "\e[34mConnexion...\e[0m" << std::endl;
 		std::stringstream	itos;
-		Str					nickname;
 		itos << "client" << this->server.RefClients().size();
 
 		this->server.Accept(itos.str());
@@ -57,7 +56,7 @@ Irc::AcceptConnexion(void)
 		this->sync.AddReadReq(localClient->GetRemote()->Get());
 		this->sync.AddExcpReq(localClient->GetRemote()->Get());
 
-		std::cout << "\e[32m" << nickname << " is successfuly connected!\e[0m" << std::endl;
+		std::cout << "\e[32m" << "successfuly connected!\e[0m" << std::endl;
 	}
 	catch (...)
 	{
@@ -77,17 +76,17 @@ Irc::HandleClients(void)
 			std::stringstream	itos;
 			itos << i;
 			int clientFd = this->server.RefClients()[i]->GetRemote()->Get();
-			//if (this->sync.Exception(clientFd))
-			//{
-			//	// del client* in std::vector of this->channels
-			//	this->server.Disconnect(this->server.RefClients()[i]);
-			//	std::cout << "POLLHUP\n";
-			//}
-			//else if (this->sync.CanRead(clientFd))
-			//{
+			if (this->sync.Exception(clientFd))
+			{
+				// del client* in std::vector of this->channels
+				this->server.Disconnect(this->server.RefClients()[i]);
+				std::cout << "POLLHUP\n";
+			}
+			else if (this->sync.CanRead(clientFd))
+			{
 				this->server.RecvFrom(i, message, 512);
 				std::cout << message << std::endl;
-			//}
+			}
 		}
 		catch (Socket::FailedRecv& e)
 		{

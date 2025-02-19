@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 15:18:49 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 15:59:03 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 17:20:53 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ Select::Exception(int fd)
 		throw (Select::FDNotInSelect());
 	return (FD_ISSET(fd, &this->ex_set));
 }
-
+# include <iostream>
 void
 Select::SnapEvents(int timeout)
 {
@@ -70,8 +70,10 @@ Select::AddWriteReq(int fd)
 {
 	this->wrfd.push_back(fd);
 	FD_SET(fd, &this->wr_set);
-	if (this->max_fd < fd)
+	if (this->wrfd.size() == 1)
 		this->max_fd = fd;
+	else
+		this->max_fd = *std::max_element(this->wrfd.begin(), this->wrfd.end());
 }
 
 void
@@ -79,8 +81,10 @@ Select::AddReadReq(int fd)
 {
 	this->rdfd.push_back(fd);
 	FD_SET(fd, &this->rd_set);
-	if (this->max_fd < fd)
+	if (this->rdfd.size() == 1)
 		this->max_fd = fd;
+	else
+		this->max_fd = *std::max_element(this->rdfd.begin(), this->rdfd.end());
 }
 
 void
@@ -88,8 +92,10 @@ Select::AddExcpReq(int fd)
 {
 	this->exfd.push_back(fd);
 	FD_SET(fd, &this->ex_set);
-	if (this->max_fd < fd)
+	if (this->exfd.size() == 1)
 		this->max_fd = fd;
+	else
+		this->max_fd = *std::max_element(this->exfd.begin(), this->exfd.end());
 }
 
 void
@@ -98,6 +104,10 @@ Select::RemoveWriteReq(int fd)
 	std::vector<int>::iterator	it = std::find(this->wrfd.begin(), this->wrfd.end(), fd);
 	this->wrfd.erase(it);
 	this->__ResetSets();
+	if (this->wrfd.size() == 0)
+		this->max_fd = 0;
+	else
+		this->max_fd = *std::max_element(this->wrfd.begin(), this->wrfd.end());
 }
 
 void
@@ -106,6 +116,10 @@ Select::RemoveReadReq(int fd)
 	std::vector<int>::iterator	it = std::find(this->rdfd.begin(), this->rdfd.end(), fd);
 	this->rdfd.erase(it);
 	this->__ResetSets();
+	if (this->rdfd.size() == 0)
+		this->max_fd = 0;
+	else if (this->max_fd == fd)
+		this->max_fd = *std::max_element(this->rdfd.begin(), this->rdfd.end());
 }
 
 void
@@ -114,6 +128,10 @@ Select::RemoveExcpReq(int fd)
 	std::vector<int>::iterator	it = std::find(this->exfd.begin(), this->exfd.end(), fd);
 	this->exfd.erase(it);
 	this->__ResetSets();
+	if (this->exfd.size() == 0)
+		this->max_fd = 0;
+	else if (this->max_fd == fd)
+		this->max_fd = *std::max_element(this->exfd.begin(), this->exfd.end());
 }
 
 void
