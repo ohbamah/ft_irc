@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/16 18:55:12 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:16:29 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,6 @@ Poll::AddFd(const Str& name, int fd, short reqv)
 	tmp.revents = 0;
 	this->names.push_back(name);
 	this->pfd.push_back(tmp);
-	this->last = &tmp;
 }
 
 bool

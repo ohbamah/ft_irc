@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/16 19:30:32 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:18:05 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,8 @@ Irc::AcceptConnexion(void)
 		this->server.Accept(itos.str());
 		Client*	localClient = this->server.FindClientByName(itos.str());
 
-		this->HandleClientConnexion(localClient);
-		nickname = localClient->GetNick();
-		this->event.AddFd(nickname, localClient->GetRemote()->Get(), Poll::WriteReq);
+		//this->HandleClientConnexion(localClient);
+		this->event.AddFd(itos.str(), localClient->GetRemote()->Get(), Poll::ReadReq);
 
 		std::cout << "\e[32m" << nickname << " is successfuly connected!\e[0m" << std::endl;
 	}
@@ -77,11 +76,11 @@ Irc::RecvMessage(void)
 		{
 			std::stringstream	itos;
 			itos << i;
-			if (this->event.WriteRequest(this->server.RefClients()[i]->GetName()))
-			{
+			//if (this->event.ReadRequest(this->server.RefClients()[i]->GetName()))
+			//{
 				this->server.RecvFrom(i, message, 512);
 				std::cout << message << std::endl;
-			}
+			//}
 		}
 		catch (Socket::FailedRecv& e)
 		{
