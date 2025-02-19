@@ -6,26 +6,27 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 14:49:42 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 16:00:15 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Irc.hpp"
 
+#include <sys/select.h>
+
 Irc::Irc(int port, const char* pass) : server(port, FControl::NonBlock)
 {
 	this->server.Listen();
 
-	this->pfd.push_back(Utils::CreatePollfd(this->server.Get(), POLLIN));
+	this->sync.AddReadReq(this->server.Get());
 	while (1)
 	{
-		std::cout << this->pfd.size() << std::endl;
-		poll(&this->pfd[0], this->pfd.size(), 0);
+		this->sync.SnapEvents(0);
 		this->HandleClients();
-		if (Utils::SearchPollfd(this->pfd, this->server.Get()).revents & POLLIN)
+		if (this->sync.CanRead(this->server.Get()))
 			this->AcceptConnexion();
 	}
-}
+}	
 
 Irc::~Irc()
 {
@@ -53,7 +54,8 @@ Irc::AcceptConnexion(void)
 
 		this->server.Accept(itos.str());
 		Client*	localClient = this->server.FindClientByName(itos.str());
-		this->pfd.push_back(Utils::CreatePollfd(localClient->GetRemote()->Get(), POLLIN | POLLOUT));
+		this->sync.AddReadReq(localClient->GetRemote()->Get());
+		this->sync.AddExcpReq(localClient->GetRemote()->Get());
 
 		std::cout << "\e[32m" << nickname << " is successfuly connected!\e[0m" << std::endl;
 	}
@@ -74,17 +76,18 @@ Irc::HandleClients(void)
 		{
 			std::stringstream	itos;
 			itos << i;
-			if (Utils::SearchPollfd(this->pfd, this->server.RefClients()[i]->GetRemote()->Get()).revents & (POLLHUP|POLLERR|POLLNVAL))
-			{
-				// del client* in std::vector of this->channels
-				this->server.Disconnect(this->server.RefClients()[i]);
-				std::cout << "POLLHUP\n";
-			}
-			else if (Utils::SearchPollfd(this->pfd, this->server.RefClients()[i]->GetRemote()->Get()).revents & (POLLIN|POLLOUT|POLLRDNORM|POLLRDBAND|POLLPRI|POLLWRNORM|POLLWRBAND))
-			{
+			int clientFd = this->server.RefClients()[i]->GetRemote()->Get();
+			//if (this->sync.Exception(clientFd))
+			//{
+			//	// del client* in std::vector of this->channels
+			//	this->server.Disconnect(this->server.RefClients()[i]);
+			//	std::cout << "POLLHUP\n";
+			//}
+			//else if (this->sync.CanRead(clientFd))
+			//{
 				this->server.RecvFrom(i, message, 512);
 				std::cout << message << std::endl;
-			}
+			//}
 		}
 		catch (Socket::FailedRecv& e)
 		{

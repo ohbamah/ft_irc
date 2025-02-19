@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 14:45:43 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 15:13:25 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ Socket::Socket(void) : bound(false), connected(false), client(true), listener(fa
 {
 }
 
-Socket::Socket(int af, int type, int prot) : bound(false), connected(false), client(false), closed(false), listener(false), com(-1)
+Socket::Socket(int af, int type, int prot) : bound(false), connected(false), client(false), listener(false), closed(false), com(-1)
 {
 	this->fd = socket(af, type, prot);
 	if (this->fd == -1)

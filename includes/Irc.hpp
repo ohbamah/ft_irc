@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:25:43 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 14:35:52 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 15:34:29 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # include "Req.hpp"
 # include "Channel.hpp"
 # include "Utils.hpp"
+# include "Select.hpp"
 
 typedef std::string Str;
 
@@ -44,7 +45,10 @@ public:
 
 private:
 	//Poll					event;
-	std::vector<pollfd>		pfd;
+	//int						max_fd;		// Creer class Select
+	//std::vector<fd_set>		sfd_rd;		// Creer class Select | le [0] est toujours le server
+	//std::vector<fd_set>		sfd_err;	// Creer class Select | le [0] est toujours le server
+	Select					sync;
 	Server					server;
 	std::vector<Channel>	channels;
 	std::vector<pollfd>		polls;

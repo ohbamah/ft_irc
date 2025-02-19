@@ -6,28 +6,18 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 14:21:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 14:26:46 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/19 15:02:17 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Utils.hpp"
 
-pollfd
-Utils::CreatePollfd(int fd, int eventToTarget)
+fd_set
+Utils::CreateSetfd(int fd)
 {
-	pollfd	ret;
+	fd_set	fset;
 
-	ret.events = eventToTarget;
-	ret.fd = fd;
-	ret.revents = 0;
-	return (ret);
-}
-
-const pollfd&
-Utils::SearchPollfd(const std::vector<pollfd>& pfd, const int& fdTargeted)
-{
-	for (unsigned long i = 0 ; i < pfd.size() ; ++i)
-		if (pfd[i].fd == fdTargeted)
-			return (pfd[i]);
-	throw (NonExistingPollfd());
+	FD_ZERO(&fset);
+	FD_SET(fd, &fset);
+	return (fset);
 }

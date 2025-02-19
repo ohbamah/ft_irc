@@ -6,7 +6,7 @@
 #    By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/13 16:21:19 by ymanchon          #+#    #+#              #
-#    Updated: 2025/02/19 14:28:56 by ymanchon         ###   ########.fr        #
+#    Updated: 2025/02/19 15:19:00 by ymanchon         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -42,6 +42,7 @@ SRCS =	./src/Irc.cpp \
 		./src/Req.cpp \
 		./src/Channel.cpp \
 		./src/Utils.cpp \
+		./src/Select.cpp \
 		./main.cpp
 
 OBJS_DIR = objs
