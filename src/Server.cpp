@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 14:48:38 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/20 15:54:45 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,4 +65,13 @@ Server::FindClientByName(const Str& name)
 		if (!this->clients[i]->GetName().compare(name))
 			return (this->clients[i]);
 	throw (Server::CantFindClient());
+}
+void
+Server::SetPassword(std::string pass){
+	this->password = pass;
+}
+
+std::string
+Server::GetPassword() const{
+	return password;
 }

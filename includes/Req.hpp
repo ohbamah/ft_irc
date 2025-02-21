@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Req.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:33:17 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 14:31:01 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/21 15:34:34 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,18 +18,20 @@
 # include "Server.hpp"
 # include "Channel.hpp"
 # include "Irc.hpp"
+# include "Select.hpp"
 
 //class Irc;
 
-# define REQ_PARAMS	Server& server, std::vector<Channel>& channels, Client* client, char* req
-# define REQ_DATA	server, channels, client, req
-# define UNUSED_REQ_PARAMS	(void)server; (void)channels, (void)client; (void)req;
+# define REQ_PARAMS	Select& select, Server& server, std::vector<Channel>& channels, Client* client, char* req
+# define REQ_DATA	select, server, channels, client, req
+# define UNUSED_REQ_PARAMS	(void)select, (void)server; (void)channels, (void)client; (void)req;
 # define REQ_COUNT	9
 
 typedef std::string Str;
 
 namespace Req
 {
+	extern Str currentLine;
 	void
 	Check(REQ_PARAMS);
 

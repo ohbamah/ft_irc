@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Irc.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 17:21:16 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/21 15:32:52 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ Irc::Irc(int port, const char* pass) : server(port, FControl::NonBlock)
 	this->server.Listen();
 
 	this->sync.AddReadReq(this->server.Get());
+	this->mdp = pass;
+	server.SetPassword(mdp);
 	while (1)
 	{
 		this->sync.SnapEvents(0);
@@ -39,7 +41,7 @@ Irc::HandleClientConnexion(Client* local)
 {
 	char	message[512];
 	local->GetRemote()->Recv(message);
-	Req::Check(this->server, this->channels, local, message);
+	Req::Check(this->sync, this->server, this->channels, local, message);
 }
 
 void
@@ -54,9 +56,12 @@ Irc::AcceptConnexion(void)
 		this->server.Accept(itos.str());
 		Client*	localClient = this->server.FindClientByName(itos.str());
 		this->sync.AddReadReq(localClient->GetRemote()->Get());
+		this->sync.AddWriteReq(localClient->GetRemote()->Get());
 		this->sync.AddExcpReq(localClient->GetRemote()->Get());
-
 		std::cout << "\e[32m" << "successfuly connected!\e[0m" << std::endl;
+		HandleClientConnexion(localClient);
+		if (localClient->GetAuthenticated())
+			std::cout << "\e[32m" << "New client connected! Socket FD: " << localClient->GetRemote()->Get() << "\e[0m" << std::endl;
 	}
 	catch (...)
 	{
@@ -78,13 +83,18 @@ Irc::HandleClients(void)
 			int clientFd = this->server.RefClients()[i]->GetRemote()->Get();
 			if (this->sync.Exception(clientFd))
 			{
-				// del client* in std::vector of this->channels
-				this->server.Disconnect(this->server.RefClients()[i]);
-				std::cout << "POLLHUP\n";
+				this->DisconnectAnyone(this->server.RefClients()[i]);
+				i = -1;
 			}
 			else if (this->sync.CanRead(clientFd))
 			{
-				this->server.RecvFrom(i, message, 512);
+				if (this->server.RecvFrom(i, message, 512) <= 0)
+				{
+					this->DisconnectAnyone(this->server.RefClients()[i]);
+					i = -1;
+					std::cout << "\e[31mDeconnexion!\e[0m\n";
+					//std::exit(0);
+				}
 				std::cout << message << std::endl;
 			}
 		}
@@ -98,4 +108,21 @@ void
 Irc::SendMessage(void)
 {
 	
+}
+Str
+Irc::getMdp() const {
+	return mdp;
+}
+
+void
+Irc::DisconnectAnyone(Client* c)
+{
+	int clientFd = c->GetRemote()->Get();
+
+	this->sync.RemoveExcpReq(clientFd);
+	this->sync.RemoveReadReq(clientFd);
+	this->sync.RemoveWriteReq(clientFd);
+	for (unsigned long i = 0 ; i < this->channels.size() ; ++i)
+		this->channels[i].Disconnect(c);
+	this->server.Disconnect(c);
 }

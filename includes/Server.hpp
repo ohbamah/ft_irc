@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:35:20 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 14:40:48 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/21 14:54:09 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,38 +38,45 @@ public:
 	Listen(void);
 
 	template <typename T>
-	void
+	int
 	SendTo(const Str& clientName, const T& data, unsigned int nbytes = sizeof(data));
 	template <typename T>
-	void
+	int
 	SendTo(const Str& clientName, const T* data, unsigned int nbytes);
 
 	template <typename T>
-	void
+	int
 	RecvFrom(const Str& clientName, T& data, unsigned int nbytes = sizeof(data));
 	template <typename T>
-	void
+	int
 	RecvFrom(const Str& clientName, T* data, unsigned int nbytes);
 
 	template <typename T>
-	void
+	int
 	SendTo(int clientIndex, const T& data, unsigned int nbytes = sizeof(data));
 	template <typename T>
-	void
+	int
 	SendTo(int clientIndex, const T* data, unsigned int nbytes);
 
 	template <typename T>
-	void
+	int
 	RecvFrom(int clientIndex, T& data, unsigned int nbytes = sizeof(data));
 	template <typename T>
-	void
+	int
 	RecvFrom(int clientIndex, T* data, unsigned int nbytes);
 
 	Client*
 	FindClientByName(const Str& name);
 
+	void
+	SetPassword(std::string pass);
+
+	std::string
+	GetPassword() const;
+
 private:
 	std::vector<Client*>	clients;
+	Str						password;
 
 public:
 	struct CantFindClient : std::exception { inline virtual const char* what(void) const throw() {return ("Client does not exist\n"); } };

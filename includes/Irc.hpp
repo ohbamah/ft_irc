@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Irc.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:25:43 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 15:34:29 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/21 14:55:24 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,16 +42,17 @@ public:
 	HandleClients(void);
 	void
 	SendMessage(void);
+	Str
+	getMdp() const;
+	void
+	DisconnectAnyone(Client* c);
 
 private:
-	//Poll					event;
-	//int						max_fd;		// Creer class Select
-	//std::vector<fd_set>		sfd_rd;		// Creer class Select | le [0] est toujours le server
-	//std::vector<fd_set>		sfd_err;	// Creer class Select | le [0] est toujours le server
 	Select					sync;
 	Server					server;
 	std::vector<Channel>	channels;
 	std::vector<pollfd>		polls;
+	Str 					mdp;
 };
 
 #endif

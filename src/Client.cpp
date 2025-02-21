@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:28:02 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 14:49:16 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/20 14:52:38 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ Client::Client(Client::Str pName, SocketRemote* pRemote)
 {
 	this->remote = pRemote;
 	this->name = pName;
+	this->authenticated = false;
+	this->disconnect = false; 
 }
 
 Client::~Client()
@@ -41,6 +43,12 @@ Client::GetRemote(void) const
 	return (this->remote);
 }
 
+bool 
+Client::GetAuthenticated() const
+{
+	return (this->authenticated);
+}
+
 void
 Client::Disconnect(void)
 {
@@ -57,5 +65,16 @@ void
 Client::SetNick(const Client::Str& pNick)
 {
 	this->nick = pNick;
+}
+void 
+Client::SetDisconnect(bool disconnect)
+{
+	this->disconnect = disconnect;
+}
+
+void 
+Client::SetAuthenticated(bool authenticated)
+{
+	this->authenticated = authenticated;
 }
 

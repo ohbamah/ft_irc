@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:34:32 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/16 19:20:02 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/02/21 14:56:05 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,12 @@ Channel::Channel(const Channel::Str& pName, const Str& pPass) : name(pName), pas
 
 Channel::~Channel()
 {
+}
+
+void
+Channel::Disconnect(Client* c)
+{
+	this->KickUser(c);
 }
 
 void
