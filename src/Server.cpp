@@ -75,3 +75,34 @@ std::string
 Server::GetPassword() const{
 	return password;
 }
+
+bool 
+Server::IsNicknameTaken(const std::string& nickname) const
+{
+    for (std::vector<Client*>::const_iterator it = clients.begin(); it != clients.end(); ++it)
+    {
+        if ((*it)->GetNick() == nickname) // (*it) pour accéder au Client*
+            return true;
+    }
+    return false;
+}
+
+
+void 
+Server::Broadcast(const std::string& message, Client* exclude, Select* select)
+{
+    for (std::vector<Client*>::const_iterator it = clients.begin(); it != clients.end(); ++it)
+    {
+        Client* client = *it; // Accéder au Client à l'aide de l'itérateur
+
+        // Ne pas envoyer le message au client exclu
+        if (client != exclude)
+        {
+            if (select->CanWrite(client->GetRemote()->Get()))
+            {
+                send(client->GetRemote()->Get(), message.c_str(), message.size(), 0);
+            }
+        }
+    }
+}
+

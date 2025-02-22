@@ -27,6 +27,8 @@ public:
 	const Str&
 	GetNick(void) const;
 	const Str&
+	GetUser(void) const;
+	const Str&
 	GetName(void) const;
 	SocketRemote*
 	GetRemote(void) const;
@@ -38,6 +40,8 @@ public:
 	void
 	SetNick(const Str& nick);
 	void
+	SetUser(const Str& nick);
+	void
 	SetName(const Str& name);
 
 	void 
@@ -48,6 +52,7 @@ public:
 private:
 	SocketRemote*	remote;
 	Str				nick;	// unique
+	Str				user;
 	Str				name;
 	bool			disconnect;
 	bool 			authenticated;

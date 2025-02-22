@@ -16,6 +16,8 @@
 # include "Client.hpp"
 # include <vector>
 # include <algorithm>
+# include <map>
+#include "Select.hpp"
 
 class Server : private Socket
 {
@@ -73,6 +75,12 @@ public:
 
 	std::string
 	GetPassword() const;
+
+	void 
+	Broadcast(const std::string& message, Client* exclude, Select* select);
+
+	bool 
+	IsNicknameTaken(const std::string& nickname) const;
 
 private:
 	std::vector<Client*>	clients;

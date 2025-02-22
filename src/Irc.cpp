@@ -59,7 +59,7 @@ Irc::AcceptConnexion(void)
 		this->sync.AddWriteReq(localClient->GetRemote()->Get());
 		this->sync.AddExcpReq(localClient->GetRemote()->Get());
 		std::cout << "\e[32m" << "successfuly connected!\e[0m" << std::endl;
-		HandleClientConnexion(localClient);
+		//HandleClientConnexion(localClient);
 		if (localClient->GetAuthenticated())
 			std::cout << "\e[32m" << "New client connected! Socket FD: " << localClient->GetRemote()->Get() << "\e[0m" << std::endl;
 	}
@@ -69,39 +69,61 @@ Irc::AcceptConnexion(void)
 	}
 }
 
-void
-Irc::HandleClients(void)
-{
-	char	message[512];
+// void
+// Irc::HandleClients(void)
+// {
+// 	char	message[512];
 
-	for (unsigned long i = 0 ; i < this->server.RefClients().size() ; ++i)
-	{
-		try
-		{
-			std::stringstream	itos;
-			itos << i;
-			int clientFd = this->server.RefClients()[i]->GetRemote()->Get();
-			if (this->sync.Exception(clientFd))
-			{
-				this->DisconnectAnyone(this->server.RefClients()[i]);
-				i = -1;
-			}
-			else if (this->sync.CanRead(clientFd))
-			{
-				if (this->server.RecvFrom(i, message, 512) <= 0)
-				{
-					this->DisconnectAnyone(this->server.RefClients()[i]);
-					i = -1;
-					std::cout << "\e[31mDeconnexion!\e[0m\n";
-					//std::exit(0);
-				}
-				std::cout << message << std::endl;
-			}
-		}
-		catch (Socket::FailedRecv& e)
-		{
-		}
-	}
+// 	for (unsigned long i = 0 ; i < this->server.RefClients().size() ; ++i)
+// 	{
+// 		try
+// 		{
+// 			std::stringstream	itos;
+// 			itos << i;
+// 			int clientFd = this->server.RefClients()[i]->GetRemote()->Get();
+// 			if (this->sync.Exception(clientFd))
+// 			{
+// 				this->DisconnectAnyone(this->server.RefClients()[i]);
+// 				i = 0;
+// 			}
+// 			else if (this->sync.CanRead(clientFd))
+// 			{
+// 				if (this->server.RecvFrom(i, message, 512) <= 0)
+// 				{
+// 					this->DisconnectAnyone(this->server.RefClients()[i]);
+// 					i = 0;
+// 					std::cout << "\e[31mDeconnexion!\e[0m\n";
+// 					//std::exit(0);
+// 				}
+// 				std::cout << message << std::endl;
+// 			}
+// 		}
+// 		catch (Socket::FailedRecv& e)
+// 		{
+// 		}
+// 	}
+// }
+
+void Irc::HandleClients(void) {
+    char message[512];
+
+    for (unsigned long i = 0; i < this->server.RefClients().size(); ++i) {
+        int clientFd = this->server.RefClients()[i]->GetRemote()->Get();
+
+        if (this->sync.CanRead(clientFd)) {
+            int bytesReceived = this->server.RecvFrom(i, message, sizeof(message) - 1);
+
+            if (bytesReceived <= 0) {
+                this->DisconnectAnyone(this->server.RefClients()[i]);
+                std::cout << "\e[31mDéconnexion!\e[0m\n";
+                i--;
+            } else {
+                message[bytesReceived] = '\0';
+                std::cout << "Message reçu : " << message;
+                Req::Check(this->sync, this->server, this->channels, this->server.RefClients()[i], message);
+            }
+        }
+    }
 }
 
 void

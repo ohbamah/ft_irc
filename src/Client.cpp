@@ -37,6 +37,12 @@ Client::GetNick(void) const
 	return (this->nick);
 }
 
+const Client::Str&
+Client::GetUser(void) const
+{
+	return (this->user);
+}
+
 SocketRemote*
 Client::GetRemote(void) const
 {
@@ -66,6 +72,13 @@ Client::SetNick(const Client::Str& pNick)
 {
 	this->nick = pNick;
 }
+
+void
+Client::SetUser(const Client::Str& pUser)
+{
+	this->user = pUser;
+}
+
 void 
 Client::SetDisconnect(bool disconnect)
 {
