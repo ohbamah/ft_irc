@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/21 15:38:45 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/24 16:44:27 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,10 +83,97 @@ Req::__INVITE(REQ_PARAMS)
 	//channelsInviteUser(client);
 }
 
+bool is_valid_channel_name(const std::string &name){
+    return !name.empty() && name[0] == '#';
+}
+
 void
 Req::__JOIN(REQ_PARAMS)
 {
-	UNUSED_REQ_PARAMS
+    std::istringstream iss;
+    std::string channelName;
+    std::string key;
+    std::getline (iss, channelName, ' ');
+    std::getline (iss, key);    
+    
+    if (!client->GetAuthenticated()) {
+        std::string errorMessage = ":localhost 462 " + client->GetName() + " :You may not reregister\r\n"; 
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+    
+    size_t spacePos = currentLine.find_first_of(' ');
+    if (spacePos == std::string::npos) {
+        spacePos = currentLine.length();
+        std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n"; //  ERR_NEEDMOREPARAMS
+		if (select.CanWrite(client->GetRemote()->Get()))
+			send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+    
+    // std::string channelName = currentLine.substr(spacePos + 1);
+    if (!is_valid_channel_name(channelName)){
+        std::string errorMessage = ":localhost 403 " + client->GetName() + channelName + " ::No such channel\r\n"; // ERR_NOSUCHCHANNEL
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+    }
+
+    Channel * channel = server.FindChannel(channels, channelName);
+    if (channel->isFull()){
+        std::string errorMessage = ":localhost 471 " + channelName + " :Cannot join channel (+l)\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+    }
+        
+    if (channel->isInviteOnly() && !channel->isInvited(client)){
+        std::string errorMessage = ":localhost 473 " + channelName + " :Cannot join channel (+i)\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+    }
+    
+    if (channel->isBanned(client)){
+        std::string errorMessage = ":localhost 474 " + client->GetName() + channelName + " :Cannot join channel (+b)\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+    }
+
+    if (channel->hasKey() && channel->GetPass().compare(key) != 0){
+        std::string errorMessage = ":localhost 475 " + client->GetName() + channelName + " :Cannot join channel (+k)\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+    }
+
+
+    channel->AddUser(client);
+    // ERR_TOOMANYCHANNELS 405
+    // "<client> <channel> :You have joined too many channels"
+    // Indicates that the JOIN command failed because the client has joined their maximum number of channels. 
+    // The text used in the last param of this message may vary.
+
+    // ERR_BADCHANNELKEY (475)
+    // "<client> <channel> :Cannot join channel (+k)"
+    // Returned to indicate that a JOIN command failed because the channel requires a key and the key was either incorrect or not supplied. 
+    // The text used in the last param of this message may vary.
+    // Not to be confused with ERR_INVALIDKEY, which may be returned when setting a key.
+
+    // ERR_BADCHANMASK (476)
+    // "<channel> :Bad Channel Mask"
+    // Indicates the supplied channel name is not a valid.
+    // This is similar to, but stronger than, ERR_NOSUCHCHANNEL (403), 
+    // which indicates that the channel does not exist, 
+    // but that it may be a valid name.
+    // The text used in the last param of this message may vary.
+
+    //RPL_TOPIC (332)
+    //"<client> <channel> :<topic>"
+    // Sent to a client when joining the <channel> 
+    // to inform them of the current topic of the channel.
+
+    // RPL_TOPICWHOTIME (333)
+    // "<client> <channel> <nick> <setat>"
+    // Sent to a client to let them know who set the topic (<nick>) and when 
+    // they set it (<setat> is a unix timestamp). Sent after RPL_TOPIC (332).
 }
 
 void
@@ -214,37 +301,37 @@ Req::__TOPIC(REQ_PARAMS)
         std::string remaining = currentLine.substr(spacePos + 1);
         size_t nextSpacePos = remaining.find(' ');
     
-        std::string channelName = (nextSpacePos == std::string::npos) ? remaining : remaining.substr(0, nextSpacePos);
+        std::string channel = (nextSpacePos == std::string::npos) ? remaining : remaining.substr(0, nextSpacePos);
         std::string topic = (nextSpacePos == std::string::npos) ? "" : remaining.substr(nextSpacePos + 1);
     
-        Channel* channel = server.GetChannel(channelName);
-        if (!channel) {
-            std::string errorMessage = ":localhost 403 " + channelName + " :No such channel\r\n";
+        Channel* currentChannel = server.GetChannel(channel);
+        if (!currentChannel) {
+            std::string errorMessage = ":localhost 403 " + channel + " :No such channel\r\n";
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
             return;
         }
     
-        if (!channel->IsMember(client)) {
-            std::string errorMessage = ":localhost 442 " + channelName + " :You're not on that channel\r\n";
+        if (!currentChannel->IsMember(client)) {
+            std::string errorMessage = ":localhost 442 " + channel + " :You're not on that channel\r\n";
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
             return;
         }
     
         if (topic.empty()) {
-            if (channel->GetTopic().empty()) {
-                std::string noTopicMessage = ":localhost 331 " + client->GetName() + " " + channelName + " :No topic is set\r\n";
+            if (currentChannel->GetTopic().empty()) {
+                std::string noTopicMessage = ":localhost 331 " + client->GetName() + " " + channel + " :No topic is set\r\n";
                 send(client->GetRemote()->Get(), noTopicMessage.c_str(), noTopicMessage.size(), 0);
             } else {
-                std::string topicMessage = ":localhost 332 " + client->GetName() + " " + channelName + " :" + channel->GetTopic() + "\r\n";
+                std::string topicMessage = ":localhost 332 " + client->GetName() + " " + channel + " :" + topic + "\r\n";
                 send(client->GetRemote()->Get(), topicMessage.c_str(), topicMessage.size(), 0);
             }
         } else { 
             if (topic[0] == ':') {
                 topic = topic.substr(1); 
             }
-            channel->SetTopic(topic);
-            std::string topicChangeMessage = ":" + client->GetName() + " TOPIC " + channelName + " :" + topic + "\r\n";
-            server.BroadcastToChannel(channel, topicChangeMessage, &select);
+            currentChannel->SetTopic(topic);
+            std::string topicChangeMessage = ":" + client->GetName() + " TOPIC " + channel + " :" + topic + "\r\n";
+            server.BroadcastToChannel(currentChannel, topicChangeMessage, &select);
         }
 }
 
@@ -252,6 +339,7 @@ Req::__TOPIC(REQ_PARAMS)
 // Parameters: <username> <hostname> <servername> <realname>
 void Req::__USER(REQ_PARAMS)
 {    
+
     size_t spacePos = currentLine.find_first_of(' ');
     if (spacePos == std::string::npos) {
         std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n";

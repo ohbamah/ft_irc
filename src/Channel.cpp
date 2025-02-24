@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:34:32 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/21 14:56:05 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/24 16:48:29 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,18 @@ Channel::Channel(const Channel::Str& pName) : name(pName)
 {
 }
 
-Channel::Channel(const Channel::Str& pName, const Str& pPass) : name(pName), pass(pPass)
+Channel::Channel(const Channel::Str& pName, const Str& pPass) : name(pName), pass(pPass), topic(""), max_clients(50), invite_only(false) 
 {
 }
 
 Channel::~Channel()
 {
 }
+
+std::string const & Channel::getName() const{
+	return name;
+}
+
 
 void
 Channel::Disconnect(Client* c)
@@ -148,3 +153,32 @@ Channel::RefInvitations(void)
 	return (this->invitations);
 }
 
+bool 
+Channel::isBanned(Client* c)
+{
+	return std::find(banned_clients.begin(), banned_clients.end(), c) != banned_clients.end();
+}
+
+bool 
+Channel::isInviteOnly() const 
+{
+	return invite_only; 
+}
+
+bool 
+Channel::isInvited(Client* c) 
+{
+	return std::find(invitations.begin(), invitations.end(), c) != invitations.end();
+}
+
+bool
+Channel::isFull() const 
+{ 
+	return users.size() >= max_clients; 
+}
+
+bool 
+Channel::hasKey() const 
+{ 
+	return !pass.empty();
+}

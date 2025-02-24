@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/20 15:54:45 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/24 15:16:11 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,4 +132,12 @@ Server::BroadcastToChannel(Channel* channel, const std::string& message, Select 
             send(client->GetRemote()->Get(), message.c_str(), message.size(), 0);
         }
     }
+}
+
+Channel * Server::FindChannel(std::vector<Channel>& channels, std::string const & name){
+   std::vector<Channel>::iterator it = channels.begin();
+    if (it->getName() == name){
+            return &(*it);
+    }
+    return NULL;
 }

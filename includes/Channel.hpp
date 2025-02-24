@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:26:14 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/21 14:55:49 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/24 15:28:54 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,34 +38,47 @@ public:
 	Channel(const Str& name, const Str& pass);
 	~Channel();
 
+	std::string const & getName() const;
 
 	void
 	Disconnect(Client* c);
+
 	void
 	AddUser(Client* c);
+
 	void
 	ElevateUser(Client* c);
+
 	void
 	RevokeUser(Client* c);
+
 	void
 	KickUser(Client* c);
+
 	void
 	InviteUser(Client* c);
 
 	const Channel::Modes&
 	GetModes(void);
+	
 	const Str&
 	GetName(void) const;
+
 	const Str&
 	GetPass(void) const;
+	
 	std::vector<Client*> 
 	GetUsers() const;
+
 	const std::string& 
 	GetTopic() const;
+
 	bool 
 	IsMember(Client* client) const;
+
 	void
 	SetName(const std::string& name);
+	
 	void
 	SetTopic(std::string topic);
 
@@ -78,6 +91,13 @@ public:
 	std::vector<Client*>&
 	RefInvitations(void);
 
+	bool isBanned(Client *c);
+	bool isInviteOnly() const;
+	bool isInvited(Client* c);
+	bool isFull() const;
+	bool hasKey() const;
+	void addClient(Client* c);
+	
 private:
 	Str						name;
 	Str						pass;
@@ -86,6 +106,9 @@ private:
 	std::vector<Client*>	users;
 	std::vector<Client*>	admin;
 	std::vector<Client*>	invitations;
+	std::vector<Client *>	banned_clients;
+	size_t					max_clients;
+	bool					invite_only;
 	
 
 public:

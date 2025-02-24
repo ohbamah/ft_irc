@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:35:20 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/21 14:54:09 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/24 15:15:02 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,9 @@ public:
 
 	bool 
 	IsNicknameTaken(const std::string& nickname) const;
+
+	Channel *
+	FindChannel(std::vector<Channel>& channel, std::string const & name);
 
 private:
 	std::vector<Client*>	clients;
