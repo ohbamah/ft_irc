@@ -101,7 +101,8 @@ Req::__MODE(REQ_PARAMS)
 	UNUSED_REQ_PARAMS
 }
 
-static bool	isForbidden(char c)
+static bool	
+isForbidden(char c)
 {
 	if (c == ' ' || c == ',' || c == '*' || c == '?' || c == '!'
 		|| c == '@' || c == '.')
@@ -110,7 +111,8 @@ static bool	isForbidden(char c)
 		return (false);
 }
 
-static bool	containsInvalidCharacters(std::string nickname)
+static bool	
+containsInvalidCharacters(std::string nickname)
 {
 	if (nickname[0] == '$' || nickname[0] == ':' || nickname[0] == '#')
 		return (true);
@@ -202,7 +204,48 @@ void Req::__PASS(REQ_PARAMS)
 void
 Req::__TOPIC(REQ_PARAMS)
 {
-	UNUSED_REQ_PARAMS
+    size_t spacePos = currentLine.find(' '); 
+    if (spacePos == std::string::npos || spacePos + 1 >= currentLine.length()) {
+        std::string errorMessage = ":localhost 461 " + client->GetName() + " TOPIC :Not enough parameters\r\n";
+        send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+    
+        std::string remaining = currentLine.substr(spacePos + 1);
+        size_t nextSpacePos = remaining.find(' ');
+    
+        std::string channelName = (nextSpacePos == std::string::npos) ? remaining : remaining.substr(0, nextSpacePos);
+        std::string topic = (nextSpacePos == std::string::npos) ? "" : remaining.substr(nextSpacePos + 1);
+    
+        Channel* channel = server.GetChannel(channelName);
+        if (!channel) {
+            std::string errorMessage = ":localhost 403 " + channelName + " :No such channel\r\n";
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+            return;
+        }
+    
+        if (!channel->IsMember(client)) {
+            std::string errorMessage = ":localhost 442 " + channelName + " :You're not on that channel\r\n";
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+            return;
+        }
+    
+        if (topic.empty()) {
+            if (channel->GetTopic().empty()) {
+                std::string noTopicMessage = ":localhost 331 " + client->GetName() + " " + channelName + " :No topic is set\r\n";
+                send(client->GetRemote()->Get(), noTopicMessage.c_str(), noTopicMessage.size(), 0);
+            } else {
+                std::string topicMessage = ":localhost 332 " + client->GetName() + " " + channelName + " :" + channel->GetTopic() + "\r\n";
+                send(client->GetRemote()->Get(), topicMessage.c_str(), topicMessage.size(), 0);
+            }
+        } else { 
+            if (topic[0] == ':') {
+                topic = topic.substr(1); 
+            }
+            channel->SetTopic(topic);
+            std::string topicChangeMessage = ":" + client->GetName() + " TOPIC " + channelName + " :" + topic + "\r\n";
+            server.BroadcastToChannel(channel, topicChangeMessage, &select);
+        }
 }
 
 

@@ -58,9 +58,16 @@ public:
 	GetName(void) const;
 	const Str&
 	GetPass(void) const;
-
+	std::vector<Client*> 
+	GetUsers() const;
+	const std::string& 
+	GetTopic() const;
+	bool 
+	IsMember(Client* client) const;
 	void
-	SetName(const Str& name);
+	SetName(const std::string& name);
+	void
+	SetTopic(std::string topic);
 
 	Channel::Modes&
 	RefModes(void);
@@ -74,10 +81,12 @@ public:
 private:
 	Str						name;
 	Str						pass;
+	Str						topic;
 	Modes					modes;
 	std::vector<Client*>	users;
 	std::vector<Client*>	admin;
 	std::vector<Client*>	invitations;
+	
 
 public:
 	struct UserNotFound : std::exception { inline virtual const char* what(void) const throw() {return ("User not found in channel.\n"); } };

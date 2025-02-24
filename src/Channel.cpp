@@ -96,27 +96,52 @@ Channel::GetPass(void) const
 	return (this->pass);
 }
 
+std::vector<Client*> 
+Channel::GetUsers() const
+{
+    return(this->users);
+}
+
+const std::string& 
+Channel::GetTopic() const{
+	return (this->topic);
+}
+
 void
-Channel::SetName(const Str& pName)
+Channel::SetTopic(std::string topic){
+	this->topic = topic;
+}
+
+void
+Channel::SetName(const std::string& pName)
 {
 	this->name = pName;
 }
+
+bool 
+Channel::IsMember(Client* client) const {
+    return std::find(users.begin(), users.end(), client) != users.end();
+}
+
 
 Channel::Modes&
 Channel::RefModes(void)
 {
 	return (this->modes);
 }
+
 std::vector<Client*>&
 Channel::RefUsers(void)
 {
 	return (this->users);
 }
+
 std::vector<Client*>&
 Channel::RefAdmin(void)
 {
 	return (this->admin);
 }
+
 std::vector<Client*>&
 Channel::RefInvitations(void)
 {

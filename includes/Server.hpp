@@ -17,7 +17,8 @@
 # include <vector>
 # include <algorithm>
 # include <map>
-#include "Select.hpp"
+# include "Select.hpp"
+# include "Channel.hpp"
 
 class Server : private Socket
 {
@@ -76,8 +77,17 @@ public:
 	std::string
 	GetPassword() const;
 
+	Channel* 
+	GetChannel(const std::string& channelName) const;
+
+	void 
+	SetChannel(const std::string& channelName, Channel* channel);
+
 	void 
 	Broadcast(const std::string& message, Client* exclude, Select* select);
+
+	void 
+	BroadcastToChannel(Channel* channel, const std::string& message, Select* select);
 
 	bool 
 	IsNicknameTaken(const std::string& nickname) const;
@@ -85,6 +95,8 @@ public:
 private:
 	std::vector<Client*>	clients;
 	Str						password;
+	Str						channel;
+	std::map<std::string, Channel *> channels;
 
 public:
 	struct CantFindClient : std::exception { inline virtual const char* what(void) const throw() {return ("Client does not exist\n"); } };
