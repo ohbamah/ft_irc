@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/24 15:16:11 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/25 15:28:51 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,17 +80,17 @@ Server::GetPassword() const{
 Channel* 
 Server::GetChannel(const std::string& channelName) const 
 {
-    std::map<std::string, Channel *>::const_iterator it = channels.find(channelName); // Supposons que `channels` est un std::map ou std::unordered_map
+    std::map<std::string, Channel *>::const_iterator it = channels.find(channelName);
     if (it != channels.end()) {
-        return it->second; // Retourne le pointeur vers le canal.
+        return it->second;
     }
-    return NULL; // Retourne nullptr si le canal n'existe pas.
+    return NULL;
 }
 
 void 
 Server::SetChannel(const std::string& channelName, Channel* channel) 
 {
-    channels[channelName] = channel; // Supposons que `channels` est un std::map<std::string, Channel*>.
+    channels[channelName] = channel;
 }
 
 
@@ -134,10 +134,54 @@ Server::BroadcastToChannel(Channel* channel, const std::string& message, Select 
     }
 }
 
-Channel * Server::FindChannel(std::vector<Channel>& channels, std::string const & name){
-   std::vector<Channel>::iterator it = channels.begin();
-    if (it->getName() == name){
-            return &(*it);
+
+Channel* Server::FindChannel(std::string const & name) {
+    std::map<std::string, Channel*>::iterator it = channels.find(name);
+    if (it != channels.end()) {
+        return it->second;
     }
     return NULL;
+}
+
+
+void Server::CreateChannel(const std::string& name) {
+    if (channels.find(name) != channels.end()) {
+        std::cout << "Channel already exists.\n";
+        return;
+    }
+
+    Channel* newChannel = new Channel(name);
+    channels[name] = newChannel; 
+    std::cout << "Channel created: " << name << std::endl;
+}
+
+
+void Server::sendChanInfos(Client *client, Channel *channel)
+{
+    if (!channel || !client)
+        return;
+
+    std::string nickname = client->GetName();
+    std::string channelName = channel->GetName();
+
+    std::string listOfMembers;
+    std::vector<Client*> users = channel->GetUsers();
+    for (size_t i = 0; i < users.size(); ++i)
+    {
+        if (std::find(channel->RefAdmin().begin(), channel->RefAdmin().end(), users[i]) != channel->RefAdmin().end())
+            listOfMembers += "@" + users[i]->GetName() + " ";
+        else
+            listOfMembers += users[i]->GetName() + " ";
+    }
+    
+    if (!listOfMembers.empty())
+    listOfMembers.erase(listOfMembers.size() - 1, 1);
+
+    // Envoie de la réponse RPL_NAMREPLY (353)
+    std::string namReply = ":localhost 353 " + nickname + " = " + channelName + " :" + listOfMembers + "\r\n";
+    send(client->GetRemote()->Get(), namReply.c_str(), namReply.size(), 0);
+
+    // Envoie de la réponse RPL_ENDOFNAMES (366)
+    std::string endOfNames = ":localhost 366 " + nickname + " " + channelName + " :End of /NAMES list\r\n";
+    send(client->GetRemote()->Get(), endOfNames.c_str(), endOfNames.size(), 0);
 }

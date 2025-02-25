@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/24 16:44:27 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/25 15:56:11 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,86 +87,14 @@ bool is_valid_channel_name(const std::string &name){
     return !name.empty() && name[0] == '#';
 }
 
-void
-Req::__JOIN(REQ_PARAMS)
-{
-    std::istringstream iss;
-    std::string channelName;
-    std::string key;
-    std::getline (iss, channelName, ' ');
-    std::getline (iss, key);    
-    
-    if (!client->GetAuthenticated()) {
-        std::string errorMessage = ":localhost 462 " + client->GetName() + " :You may not reregister\r\n"; 
-        if (select.CanWrite(client->GetRemote()->Get()))
-            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
-        return;
-    }
-    
-    size_t spacePos = currentLine.find_first_of(' ');
-    if (spacePos == std::string::npos) {
-        spacePos = currentLine.length();
-        std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n"; //  ERR_NEEDMOREPARAMS
-		if (select.CanWrite(client->GetRemote()->Get()))
-			send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
-        return;
-    }
-    
-    // std::string channelName = currentLine.substr(spacePos + 1);
-    if (!is_valid_channel_name(channelName)){
-        std::string errorMessage = ":localhost 403 " + client->GetName() + channelName + " ::No such channel\r\n"; // ERR_NOSUCHCHANNEL
-        if (select.CanWrite(client->GetRemote()->Get()))
-            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
-    }
-
-    Channel * channel = server.FindChannel(channels, channelName);
-    if (channel->isFull()){
-        std::string errorMessage = ":localhost 471 " + channelName + " :Cannot join channel (+l)\r\n";
-        if (select.CanWrite(client->GetRemote()->Get()))
-            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
-    }
-        
-    if (channel->isInviteOnly() && !channel->isInvited(client)){
-        std::string errorMessage = ":localhost 473 " + channelName + " :Cannot join channel (+i)\r\n";
-        if (select.CanWrite(client->GetRemote()->Get()))
-            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
-    }
-    
-    if (channel->isBanned(client)){
-        std::string errorMessage = ":localhost 474 " + client->GetName() + channelName + " :Cannot join channel (+b)\r\n";
-        if (select.CanWrite(client->GetRemote()->Get()))
-            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
-    }
-
-    if (channel->hasKey() && channel->GetPass().compare(key) != 0){
-        std::string errorMessage = ":localhost 475 " + client->GetName() + channelName + " :Cannot join channel (+k)\r\n";
-        if (select.CanWrite(client->GetRemote()->Get()))
-            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
-    }
-
-
-    channel->AddUser(client);
     // ERR_TOOMANYCHANNELS 405
     // "<client> <channel> :You have joined too many channels"
     // Indicates that the JOIN command failed because the client has joined their maximum number of channels. 
     // The text used in the last param of this message may vary.
 
-    // ERR_BADCHANNELKEY (475)
-    // "<client> <channel> :Cannot join channel (+k)"
-    // Returned to indicate that a JOIN command failed because the channel requires a key and the key was either incorrect or not supplied. 
-    // The text used in the last param of this message may vary.
-    // Not to be confused with ERR_INVALIDKEY, which may be returned when setting a key.
 
-    // ERR_BADCHANMASK (476)
-    // "<channel> :Bad Channel Mask"
-    // Indicates the supplied channel name is not a valid.
-    // This is similar to, but stronger than, ERR_NOSUCHCHANNEL (403), 
-    // which indicates that the channel does not exist, 
-    // but that it may be a valid name.
-    // The text used in the last param of this message may vary.
-
-    //RPL_TOPIC (332)
-    //"<client> <channel> :<topic>"
+    // RPL_TOPIC (332)
+    // "<client> <channel> :<topic>"
     // Sent to a client when joining the <channel> 
     // to inform them of the current topic of the channel.
 
@@ -174,7 +102,196 @@ Req::__JOIN(REQ_PARAMS)
     // "<client> <channel> <nick> <setat>"
     // Sent to a client to let them know who set the topic (<nick>) and when 
     // they set it (<setat> is a unix timestamp). Sent after RPL_TOPIC (332).
+
+// void Req::__JOIN(REQ_PARAMS)
+// {
+//     if (currentLine.empty()) {
+//         std::cerr << "Error: currentLine is empty!" << std::endl;
+//         return;
+//     }
+//     std::istringstream iss(currentLine);
+//     std::string command, channelName, key;
+//     std::getline(iss, command, ' ');
+//     if (!std::getline(iss, channelName, ' ') || channelName.empty()) {
+//         std::cerr << "Error: Missing or invalid channel name!" << std::endl;
+//         return;
+//     }
+//     if (std::getline(iss, key)) {
+//         if (key.empty()) {
+//             key.clear();
+//         }
+//     }
+    
+//     if (!client->GetAuthenticated()) {
+//         std::string errorMessage = ":localhost 462 " + client->GetName() + " :You may not reregister\r\n";
+//         if (select.CanWrite(client->GetRemote()->Get()))
+//             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+//         return;
+//     }
+ 
+//     if (channelName.empty()) {
+//         std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n";
+//         if (select.CanWrite(client->GetRemote()->Get()))
+//             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+//         return;
+//     }
+
+//     if (!is_valid_channel_name(channelName)) {
+//         std::string errorMessage = ":localhost 403 " + client->GetName() + " " + channelName + " :No such channel\r\n";
+//         if (select.CanWrite(client->GetRemote()->Get()))
+//             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+//         return;
+//     }
+    
+//     Channel* channel = server.FindChannel(channelName);
+//     if (!channel) {
+//         std::cout << "Channel not found. Creating new channel: " << channelName << std::endl;
+//         server.CreateChannel(channelName);  // Create the channel if it doesn't exist
+//         channel = server.FindChannel(channelName); // Retrieve it again
+        
+//         if (!channel) {
+//             std::cerr << "Error: Channel creation failed!" << std::endl;
+//             return;
+//         }
+    
+//         std::cout << "Channel created successfully." << std::endl;
+//     } else {
+//         std::cout << "Channel found: " << channelName << std::endl;
+//     }
+    
+    
+    
+    
+    
+
+//     if (channel->isFull()) {
+//         std::string errorMessage = ":localhost 471 " + client->GetName() + " " + channelName + " :Cannot join channel (+l)\r\n";
+//         if (select.CanWrite(client->GetRemote()->Get()))
+//             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+//         return;
+//     }
+
+//     if (channel->isInviteOnly() && !channel->isInvited(client)) {
+//         std::string errorMessage = ":localhost 473 " + client->GetName() + " " + channelName + " :Cannot join channel (+i)\r\n";
+//         if (select.CanWrite(client->GetRemote()->Get()))
+//             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+//         return;
+//     }
+    
+//     if (channel->isBanned(client)) {
+//         std::string errorMessage = ":localhost 474 " + client->GetName() + " " + channelName + " :Cannot join channel (+b)\r\n";
+//         if (select.CanWrite(client->GetRemote()->Get()))
+//             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+//         return;
+//     }
+    
+//     if (channel->hasKey() && channel->GetPass() != key) {
+//         std::string errorMessage = ":localhost 475 " + client->GetName() + " " + channelName + " :Cannot join channel (+k)\r\n";
+//         if (select.CanWrite(client->GetRemote()->Get()))
+//             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+//         return;
+//     }
+    
+//     channel->AddUser(client);
+//     server.sendChanInfos(client, channel);
+// }
+
+void Req::__JOIN(REQ_PARAMS)
+{
+    if (currentLine.empty()) {
+        std::cerr << "Error: currentLine is empty!" << std::endl;
+        return;
+    }
+    
+    std::istringstream iss(currentLine);
+    std::string command, channelName, key;
+    std::getline(iss, command, ' ');
+    if (!std::getline(iss, channelName, ' ') || channelName.empty()) {
+        std::cerr << "Error: Missing or invalid channel name!" << std::endl;
+        return;
+    }
+    
+    if (std::getline(iss, key)) {
+        if (key.empty()) {
+            key.clear();
+        }
+    }
+    
+    if (!client->GetAuthenticated()) {
+        std::string errorMessage = ":localhost 462 " + client->GetName() + " :You may not reregister\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+ 
+    if (channelName.empty()) {
+        std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+
+    if (!is_valid_channel_name(channelName)) {
+        std::string errorMessage = ":localhost 403 " + client->GetName() + " " + channelName + " :No such channel\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+    
+    Channel* channel = server.FindChannel(channelName);
+    if (!channel) {
+        std::cout << "Channel not found. Creating new channel: " << channelName << std::endl;
+        server.CreateChannel(channelName);
+        channel = server.FindChannel(channelName);
+        
+        if (!channel) {
+            std::cerr << "Error: Channel creation failed!" << std::endl;
+            return;
+        }
+    
+        std::cout << "Channel created successfully." << std::endl;
+    } else {
+        std::cout << "Channel found: " << channelName << std::endl;
+    }
+    
+    if (channel->isFull()) {
+        std::string errorMessage = ":localhost 471 " + client->GetName() + " " + channelName + " :Cannot join channel (+l)\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+
+    if (channel->isInviteOnly() && !channel->isInvited(client)) {
+        std::string errorMessage = ":localhost 473 " + client->GetName() + " " + channelName + " :Cannot join channel (+i)\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+    
+    if (channel->isBanned(client)) {
+        std::string errorMessage = ":localhost 474 " + client->GetName() + " " + channelName + " :Cannot join channel (+b)\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+    
+    if (channel->hasKey() && channel->GetPass() != key) {
+        std::string errorMessage = ":localhost 475 " + client->GetName() + " " + channelName + " :Cannot join channel (+k)\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+
+    // try {
+    //     channel->AddUser(client);
+    // } catch (const Channel::UserAlreadyInChannel& e) {
+    //     std::cerr << "Error: " << e.what() << std::endl;
+    // }
+    
+    server.sendChanInfos(client, channel);
 }
+
+
 
 void
 Req::__KICK(REQ_PARAMS)
@@ -201,7 +318,7 @@ isForbidden(char c)
 static bool	
 containsInvalidCharacters(std::string nickname)
 {
-	if (nickname[0] == '$' || nickname[0] == ':' || nickname[0] == '#')
+	if (nickname[0] == '$' || nickname[0] == ':') //|| nickname[0] == '#')
 		return (true);
 	
 	for (size_t i = 0; i < nickname.size(); i++) {

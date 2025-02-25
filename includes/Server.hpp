@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:35:20 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/24 15:15:02 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/25 14:52:21 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,9 @@
 # include <vector>
 # include <algorithm>
 # include <map>
+# include <string>
+# include <iomanip>
+# include <iostream>
 # include "Select.hpp"
 # include "Channel.hpp"
 
@@ -92,8 +95,15 @@ public:
 	bool 
 	IsNicknameTaken(const std::string& nickname) const;
 
+	// Channel *
+	// FindChannel(std::vector<Channel>& channel, std::string const & name);
+
 	Channel *
-	FindChannel(std::vector<Channel>& channel, std::string const & name);
+	FindChannel(std::string const &name);
+
+	void CreateChannel(std::string const &channelName);
+
+	void sendChanInfos(Client *client, Channel *channel);
 
 private:
 	std::vector<Client*>	clients;

@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:34:32 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/24 16:48:29 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/25 15:53:12 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ Channel::Modes::~Modes()
 {
 }
 
-Channel::Channel(const Channel::Str& pName) : name(pName) 
+Channel::Channel(const Channel::Str& pName) : name(pName), pass(""), topic(""), max_clients(50), invite_only(false)
 {
 }
 
@@ -54,6 +54,7 @@ Channel::AddUser(Client* c)
 	else
 		throw (Channel::UserAlreadyInChannel());
 }
+
 void
 Channel::ElevateUser(Client* c)
 {
@@ -174,8 +175,11 @@ Channel::isInvited(Client* c)
 bool
 Channel::isFull() const 
 { 
+	std::cout << users.size() << std::endl;
+	std::cout << max_clients << std::endl;
 	return users.size() >= max_clients; 
 }
+
 
 bool 
 Channel::hasKey() const 

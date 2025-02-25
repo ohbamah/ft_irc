@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:26:14 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/24 15:28:54 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/25 15:29:59 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,9 @@
 
 # include <vector>
 # include <algorithm>
+# include <string>
+# include <iomanip>
+# include <iostream>
 # include "Client.hpp"
 
 class Channel
@@ -96,7 +99,6 @@ public:
 	bool isInvited(Client* c);
 	bool isFull() const;
 	bool hasKey() const;
-	void addClient(Client* c);
 	
 private:
 	Str						name;
