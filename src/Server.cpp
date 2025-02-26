@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/26 15:19:01 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/26 15:55:23 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,6 +143,15 @@ Channel* Server::FindChannel(std::string const & name) {
     return NULL;
 }
 
+Client* Server::FindClient(const std::string& name) const {
+    for (std::vector<Client*>::const_iterator it = clients.begin(); it != clients.end(); ++it) {
+        if ((*it)->GetName() == name) {
+            return *it;
+        }
+    }
+    return NULL;
+}
+
 
 void Server::CreateChannel(const std::string& name) {
     if (channels.find(name) != channels.end()) {
@@ -168,9 +177,9 @@ void Server::sendChanInfos(Client *client, Channel *channel)
     for (size_t i = 0; i < users.size(); ++i)
     {
         if (std::find(channel->RefAdmin().begin(), channel->RefAdmin().end(), users[i]) != channel->RefAdmin().end())
-            listOfMembers += "@" + users[i]->GetName() + " ";
+            listOfMembers += "@" + users[i]->GetNick() + " ";
         else
-            listOfMembers += users[i]->GetName() + " ";
+            listOfMembers += users[i]->GetNick() + " ";
     }
     
     if (!listOfMembers.empty())

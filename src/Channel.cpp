@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:34:32 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/26 15:17:41 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/26 16:22:22 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ std::string const & Channel::getName() const{
 }
 
 
+
 void
 Channel::Disconnect(Client* c)
 {
@@ -54,7 +55,6 @@ void Channel::AddUser(Client* c)
         this->invitations.erase(it);
 }
 
-
 void
 Channel::ElevateUser(Client* c)
 {
@@ -63,14 +63,22 @@ Channel::ElevateUser(Client* c)
 	else
 		throw (Channel::UserNotFound());
 }
-void
+void 
 Channel::RevokeUser(Client* c)
 {
-	if (std::find(this->users.begin(), this->users.end(), c) != this->users.end())
-		this->admin.erase(std::find(this->admin.begin(), this->admin.end(), c));
-	else
-		throw (Channel::UserNotFound());
+    std::vector<Client*>::iterator it = std::find(this->users.begin(), this->users.end(), c);
+    if (it != this->users.end())
+    {
+        this->users.erase(it);
+        
+        std::vector<Client*>::iterator adminIt = std::find(this->admin.begin(), this->admin.end(), c);
+        if (adminIt != this->admin.end())
+            this->admin.erase(adminIt);
+    }
+    else
+        throw Channel::UserNotFound();
 }
+
 void
 Channel::KickUser(Client* c)
 {
@@ -191,12 +199,12 @@ Channel::isOperator(Client* client) const
 	return std::find(admin.begin(), admin.end(), client) != admin.end();
 }
 
-// bool 
-// Channel::IsAdmin(Client* client) const {
-// 	for (Client* admin : admins) {
-// 		if (admin == client) {
-// 			return true;
-// 		}
-// 	}
-// 	return false;
-// }
+bool 
+Channel::IsAdmin(Client* client) const {
+    for (std::vector<Client*>::const_iterator it = admin.begin(); it != admin.end(); ++it) {
+        if (*it == client) {
+            return true;
+        }
+    }
+    return false;
+}

@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/26 15:23:28 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/26 16:26:02 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,6 +220,8 @@ void Req::__JOIN(REQ_PARAMS)
     } catch (const Channel::UserAlreadyInChannel& e){
         std::cerr << "Error: " << e.what() << std::endl;
     }
+    std::string joinMessage = ":" + client->GetName() + "!~" + client->GetName() + "@localhost JOIN " + channelName + "\r\n";
+    server.Broadcast(joinMessage, client, &select);
     try {
     channel->ElevateUser(client);
     } catch (const Channel::UserNotFound& e){
@@ -264,7 +266,8 @@ void Req::__JOIN(REQ_PARAMS)
     } catch (const Channel::UserAlreadyInChannel& e) {
         //std::cerr << "Error: " << e.what() << std::endl;
     }
-    // channel->AddUser(client);
+    std::string joinMessage = ":" + client->GetName() + "!~" + client->GetName() + "@localhost JOIN " + channelName + "\r\n";
+    server.Broadcast(joinMessage, client, &select);
     server.sendChanInfos(client, channel);
 }
 
@@ -274,12 +277,58 @@ void Req::__JOIN(REQ_PARAMS)
 /******************************************************/
 /*                      KICK                          */
 /******************************************************/
-
-void
+//Parameters: <channel> <user> [<comment>]
+void 
 Req::__KICK(REQ_PARAMS)
 {
-	UNUSED_REQ_PARAMS
+    std::istringstream iss(currentLine);
+    std::string command, channelName, targetNick, reason;
+    
+    iss >> command >> channelName >> targetNick;
+    std::getline(iss, reason);
+    if (!reason.empty() && reason[0] == ':')
+        reason = reason.substr(1);
+
+    Channel* channel = server.FindChannel(channelName);
+    if (!channel) {
+        std::string errorMessage = ":localhost 403 " + client->GetName() + " " + channelName + " :No such channel\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+
+    if (!channel->IsMember(client)) {
+        std::string errorMessage = ":localhost 442 " + client->GetName() + " " + channelName + " :You're not on that channel\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+
+    if (!channel->IsAdmin(client)) {
+        std::string errorMessage = ":localhost 482 " + client->GetName() + " " + channelName + " :You're not channel operator\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+
+    Client* targetClient = server.FindClient(targetNick);
+    if (!targetClient || !channel->IsMember(targetClient)) {
+        std::string errorMessage = ":localhost 441 " + client->GetName() + " " + targetNick + " " + channelName + " :They aren't on that channel\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+
+    channel->RevokeUser(targetClient);
+
+    std::string kickMessage = ":" + client->GetName() + " KICK " + channelName + " " + targetNick + " :" + reason + "\r\n";
+    std::cout << kickMessage << std::endl;
+
+    std::string targetMessage = ":localhost 482 " + targetNick + " " + channelName + " :You have been kicked by " + client->GetName() + " (" + reason + ")\r\n";
+    if (select.CanWrite(client->GetRemote()->Get()))
+        send(targetClient->GetRemote()->Get(), targetMessage.c_str(), targetMessage.size(), 0);
 }
+
 
 
 

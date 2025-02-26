@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:26:14 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/26 15:02:36 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/26 16:24:26 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <iomanip>
 # include <iostream>
 # include "Client.hpp"
+
 
 class Channel
 {
@@ -100,8 +101,8 @@ public:
 	bool isFull() const;
 	bool hasKey() const;
 	bool isOperator(Client* client) const;
-	void addInvite(Client* targetClient);
 	bool IsAdmin(Client* client) const;
+	Client* FindClient(const std::string& name) const;
 	
 private:
 	Str						name;
