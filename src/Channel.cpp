@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:34:32 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/25 15:53:12 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/26 15:17:41 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,17 +43,17 @@ Channel::Disconnect(Client* c)
 	this->KickUser(c);
 }
 
-void
-Channel::AddUser(Client* c)
+void Channel::AddUser(Client* c)
 {
-	if (std::find(this->users.begin(), this->users.end(), c) != this->users.end())
-	{
-		this->users.push_back(c);
-		this->invitations.erase(std::find(this->invitations.begin(), this->invitations.end(), c));
-	}
-	else
-		throw (Channel::UserAlreadyInChannel());
+    if (std::find(this->users.begin(), this->users.end(), c) != this->users.end())
+        throw Channel::UserAlreadyInChannel();
+    
+    this->users.push_back(c);
+    std::vector<Client*>::iterator it = std::find(this->invitations.begin(), this->invitations.end(), c);
+    if (it != this->invitations.end())
+        this->invitations.erase(it);
 }
+
 
 void
 Channel::ElevateUser(Client* c)
@@ -175,8 +175,6 @@ Channel::isInvited(Client* c)
 bool
 Channel::isFull() const 
 { 
-	std::cout << users.size() << std::endl;
-	std::cout << max_clients << std::endl;
 	return users.size() >= max_clients; 
 }
 
@@ -186,3 +184,19 @@ Channel::hasKey() const
 { 
 	return !pass.empty();
 }
+
+bool 
+Channel::isOperator(Client* client) const 
+{
+	return std::find(admin.begin(), admin.end(), client) != admin.end();
+}
+
+// bool 
+// Channel::IsAdmin(Client* client) const {
+// 	for (Client* admin : admins) {
+// 		if (admin == client) {
+// 			return true;
+// 		}
+// 	}
+// 	return false;
+// }

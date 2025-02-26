@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/21 15:32:52 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/26 13:29:22 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,6 @@ Irc::AcceptConnexion(void)
 		this->sync.AddExcpReq(localClient->GetRemote()->Get());
 		std::cout << "\e[32m" << "successfuly connected!\e[0m" << std::endl;
 		//HandleClientConnexion(localClient);
-		if (localClient->GetAuthenticated())
-			std::cout << "\e[32m" << "New client connected! Socket FD: " << localClient->GetRemote()->Get() << "\e[0m" << std::endl;
 	}
 	catch (...)
 	{
@@ -119,7 +117,7 @@ void Irc::HandleClients(void) {
                 i--;
             } else {
                 message[bytesReceived] = '\0';
-                std::cout << "Message reçu : " << message;
+                //std::cout << "Message reçu : " << message;
                 Req::Check(this->sync, this->server, this->channels, this->server.RefClients()[i], message);
             }
         }

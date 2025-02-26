@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:26:14 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/25 15:29:59 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/26 15:02:36 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,9 @@ public:
 	bool isInvited(Client* c);
 	bool isFull() const;
 	bool hasKey() const;
+	bool isOperator(Client* client) const;
+	void addInvite(Client* targetClient);
+	bool IsAdmin(Client* client) const;
 	
 private:
 	Str						name;

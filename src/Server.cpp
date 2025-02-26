@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/25 15:28:51 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/26 15:19:01 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,7 +152,6 @@ void Server::CreateChannel(const std::string& name) {
 
     Channel* newChannel = new Channel(name);
     channels[name] = newChannel; 
-    std::cout << "Channel created: " << name << std::endl;
 }
 
 
@@ -161,7 +160,7 @@ void Server::sendChanInfos(Client *client, Channel *channel)
     if (!channel || !client)
         return;
 
-    std::string nickname = client->GetName();
+    std::string nickname = client->GetNick();
     std::string channelName = channel->GetName();
 
     std::string listOfMembers;
@@ -176,6 +175,7 @@ void Server::sendChanInfos(Client *client, Channel *channel)
     
     if (!listOfMembers.empty())
     listOfMembers.erase(listOfMembers.size() - 1, 1);
+    std::cout << listOfMembers << std::endl;
 
     // Envoie de la réponse RPL_NAMREPLY (353)
     std::string namReply = ":localhost 353 " + nickname + " = " + channelName + " :" + listOfMembers + "\r\n";
@@ -184,4 +184,14 @@ void Server::sendChanInfos(Client *client, Channel *channel)
     // Envoie de la réponse RPL_ENDOFNAMES (366)
     std::string endOfNames = ":localhost 366 " + nickname + " " + channelName + " :End of /NAMES list\r\n";
     send(client->GetRemote()->Get(), endOfNames.c_str(), endOfNames.size(), 0);
+}
+
+Client* 
+Server::getClientByNick(const std::string& nick) 
+{
+    for (size_t i = 0; i < clients.size(); ++i) {
+        if (clients[i]->GetName() == nick)
+            return clients[i];
+    }
+    return NULL;
 }

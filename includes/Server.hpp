@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:35:20 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/25 14:52:21 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/26 11:31:10 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,9 +101,14 @@ public:
 	Channel *
 	FindChannel(std::string const &name);
 
-	void CreateChannel(std::string const &channelName);
+	void 
+	CreateChannel(std::string const &channelName);
 
-	void sendChanInfos(Client *client, Channel *channel);
+	void 
+	sendChanInfos(Client *client, Channel *channel);
+
+	Client* 
+	getClientByNick(const std::string& nick);
 
 private:
 	std::vector<Client*>	clients;

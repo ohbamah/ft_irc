@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:25:46 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/21 13:40:25 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/26 12:09:05 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,15 @@ public:
 	void
 	SetNick(const Str& nick);
 	void
-	SetUser(const Str& nick);
+	SetUser(const Str& pUser);
 	void
-	SetName(const Str& name);
+	SetName(const Str& pName);
+	void
+	SetRealname(const Str& realname);
+	void
+	SetHostname(const Str& hostname);
+	void
+	SetServername(const Str& servername);
 
 	void 
 	SetDisconnect(bool disconnect);
@@ -54,6 +60,9 @@ private:
 	Str				nick;	// unique
 	Str				user;
 	Str				name;
+	Str				realname;
+	Str				hostname;
+	Str				servername;
 	bool			disconnect;
 	bool 			authenticated;
 };

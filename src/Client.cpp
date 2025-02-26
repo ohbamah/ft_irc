@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:28:02 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/20 14:52:38 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/26 13:35:54 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,10 @@ Client::Client(Client::Str pName, SocketRemote* pRemote)
 {
 	this->remote = pRemote;
 	this->name = pName;
+	this->realname = "";
+	this->hostname = "";
+	this->servername = "";
+	this->nick = "";
 	this->authenticated = false;
 	this->disconnect = false; 
 }
@@ -77,6 +81,24 @@ void
 Client::SetUser(const Client::Str& pUser)
 {
 	this->user = pUser;
+}
+
+void
+Client::SetRealname(const Client::Str& realname)
+{
+	this->realname = realname;
+}
+
+void
+Client::SetHostname(const Client::Str& hostname)
+{
+	this->hostname = hostname;
+}
+
+void
+Client::SetServername(const Client::Str& servername)
+{
+	this->servername = servername;
 }
 
 void 
