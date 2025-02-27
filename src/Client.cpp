@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:28:02 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/26 13:35:54 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/27 11:30:30 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,3 +113,8 @@ Client::SetAuthenticated(bool authenticated)
 	this->authenticated = authenticated;
 }
 
+bool 
+Client::isOperator(Channel* channel)
+{
+    return std::find(operatorChannels.begin(), operatorChannels.end(), channel) != operatorChannels.end();
+}

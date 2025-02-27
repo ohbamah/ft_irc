@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/26 15:55:23 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/27 16:13:01 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,7 +145,7 @@ Channel* Server::FindChannel(std::string const & name) {
 
 Client* Server::FindClient(const std::string& name) const {
     for (std::vector<Client*>::const_iterator it = clients.begin(); it != clients.end(); ++it) {
-        if ((*it)->GetName() == name) {
+        if ((*it)->GetNick() == name) {
             return *it;
         }
     }
@@ -153,15 +153,13 @@ Client* Server::FindClient(const std::string& name) const {
 }
 
 
-void Server::CreateChannel(const std::string& name) {
-    if (channels.find(name) != channels.end()) {
-        std::cout << "Channel already exists.\n";
-        return;
-    }
-
-    Channel* newChannel = new Channel(name);
-    channels[name] = newChannel; 
+void Server::CreateChannel(const std::string& channelName) {
+    
+    Channel* newChannel = new Channel(channelName);
+    channels[channelName] = newChannel;
 }
+
+
 
 
 void Server::sendChanInfos(Client *client, Channel *channel)
@@ -184,7 +182,6 @@ void Server::sendChanInfos(Client *client, Channel *channel)
     
     if (!listOfMembers.empty())
     listOfMembers.erase(listOfMembers.size() - 1, 1);
-    std::cout << listOfMembers << std::endl;
 
     // Envoie de la réponse RPL_NAMREPLY (353)
     std::string namReply = ":localhost 353 " + nickname + " = " + channelName + " :" + listOfMembers + "\r\n";
@@ -195,11 +192,9 @@ void Server::sendChanInfos(Client *client, Channel *channel)
     send(client->GetRemote()->Get(), endOfNames.c_str(), endOfNames.size(), 0);
 }
 
-Client* 
-Server::getClientByNick(const std::string& nick) 
-{
+Client* Server::getClientByNick(const std::string& nick) {
     for (size_t i = 0; i < clients.size(); ++i) {
-        if (clients[i]->GetName() == nick)
+        if (clients[i]->GetNick() == nick)
             return clients[i];
     }
     return NULL;

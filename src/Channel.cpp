@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:34:32 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/26 16:22:22 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/27 16:18:15 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ Channel::RevokeUser(Client* c)
 void
 Channel::KickUser(Client* c)
 {
-	
+	(void)c;	
 }
 void
 Channel::InviteUser(Client* c)
@@ -207,4 +207,66 @@ Channel::IsAdmin(Client* client) const {
         }
     }
     return false;
+}
+
+void
+Channel::SetPass(Str pass){
+	this->pass = pass;
+}
+
+void
+Channel::addOperator(Client* client) {
+	if (!isOperator(client)) {
+		admin.push_back(client);
+	}
+}
+
+void 
+Channel::removeOperator(Client* client) {
+	for (size_t i = 0; i < admin.size(); ++i) {
+		if (admin[i] == client) {
+			admin.erase(admin.begin() + i);
+			break;
+		}
+	}
+}
+
+bool 
+Channel::isTopicRestricted() const 
+{ 
+	return topicRestricted;
+}
+
+void 
+Channel::setTopicRestricted(bool restricted) 
+{ 
+	topicRestricted = restricted; 
+}
+
+int Channel::getMaxClients() const 
+{ 
+	return max_clients; 
+}
+
+void Channel::setMaxClients(int max) 
+{ 
+	max_clients = max; 
+}
+
+void
+Channel::SetInviteOnly(bool value)
+{
+	this->invite_only = value;
+}
+
+void 
+Channel::broadcastMessage(Client* sender, const std::string& message, Select& select) {
+    for (size_t i = 0; i < users.size(); ++i) {
+        if (users[i] != sender) {
+            std::string fullMessage = ":" + sender->GetNick() + " PRIVMSG " + name + " :" + message + "\r\n";
+            if (select.CanWrite(users[i]->GetRemote()->Get())) {
+                send(users[i]->GetRemote()->Get(), fullMessage.c_str(), fullMessage.size(), 0);
+            }
+        }
+    }
 }

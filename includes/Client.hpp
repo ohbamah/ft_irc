@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:25:46 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/26 12:09:05 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/27 13:08:38 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 #define CLIENT_HPP
 
 # include "Socket.hpp"
+# include "Channel.hpp"
+
+class Channel ;
 
 class Client
 {
@@ -49,11 +52,12 @@ public:
 	SetHostname(const Str& hostname);
 	void
 	SetServername(const Str& servername);
-
 	void 
 	SetDisconnect(bool disconnect);
 	void 
 	SetAuthenticated(bool authenticated);
+	bool 
+	isOperator(Channel* channel);
 
 private:
 	SocketRemote*	remote;
@@ -65,6 +69,7 @@ private:
 	Str				servername;
 	bool			disconnect;
 	bool 			authenticated;
+	std::vector<Channel*> operatorChannels; 
 };
 
 #endif

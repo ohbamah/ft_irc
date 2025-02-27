@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:26:14 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/26 16:24:26 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/27 14:59:44 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,9 @@
 # include <iomanip>
 # include <iostream>
 # include "Client.hpp"
+# include "Select.hpp"
 
+class Client ;
 
 class Channel
 {
@@ -70,6 +72,9 @@ public:
 
 	const Str&
 	GetPass(void) const;
+
+	void
+	SetPass(Str pass);
 	
 	std::vector<Client*> 
 	GetUsers() const;
@@ -102,9 +107,16 @@ public:
 	bool hasKey() const;
 	bool isOperator(Client* client) const;
 	bool IsAdmin(Client* client) const;
-	Client* FindClient(const std::string& name) const;
+	void addOperator(Client* client);
+	void removeOperator(Client* client);
+	bool isTopicRestricted() const;
+    void setTopicRestricted(bool restricted);
+	int getMaxClients() const;
+    void setMaxClients(int limit);
+	void SetInviteOnly(bool value);
+	void broadcastMessage(Client* sender, const std::string& message, Select& select);
 	
-private:
+private: 
 	Str						name;
 	Str						pass;
 	Str						topic;
@@ -115,6 +127,7 @@ private:
 	std::vector<Client *>	banned_clients;
 	size_t					max_clients;
 	bool					invite_only;
+	bool					topicRestricted;						
 	
 
 public:
