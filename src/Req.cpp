@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/27 16:49:48 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/28 13:11:12 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,7 +241,8 @@ Req::__JOIN(REQ_PARAMS)
             std::cerr << RED << "Error: Channel creation failed!" << RESET << std::endl;
             return;
         }
-        
+    std::cout << "DEBUG: Channel invite-only status = " << channel->isInviteOnly() << ", Client invited = " << channel->isInvited(client) << std::endl;
+
     try {
     channel->AddUser(client);
     } catch (const Channel::UserAlreadyInChannel& e){
@@ -273,22 +274,15 @@ Req::__JOIN(REQ_PARAMS)
         return;
     }
     
-    if (channel->isBanned(client)) {
-        std::string errorMessage = ":localhost 474 " + client->GetNick() + " " + channelName + " :Cannot join channel (+b)\r\n";
-        if (select.CanWrite(client->GetRemote()->Get()))
-            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
-        return;
-    }
-    
     if (channel->hasKey()) {
-        if (!key.empty() || channel->GetPass() != key) {
+        if (key.empty() && channel->GetPass() != key) { 
             std::string errorMessage = ":localhost 475 " + client->GetNick() + " " + channelName + " :Cannot join channel (+k)\r\n";
             if (select.CanWrite(client->GetRemote()->Get()))
                 send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
             return;
         }
     }
-
+    std::cout << "DEBUG: Channel invite-only status = " << channel->isInviteOnly() << ", Client invited = " << channel->isInvited(client) << std::endl;
     try {
         channel->AddUser(client);
     } catch (const Channel::UserAlreadyInChannel& e) {
@@ -366,102 +360,112 @@ Req::__KICK(REQ_PARAMS)
 /******************************************************/
 /*                      MODE                          */
 /******************************************************/
-
-void Req::__MODE(REQ_PARAMS) 
+void 
+Req::__MODE(REQ_PARAMS)
 {
     UNUSED_REQ_PARAMS;
-    if (!client)
-        return;
-
-    std::stringstream ss(currentLine);
-    std::string command, channelName;
-    ss >> command >> channelName;
-
-    if (client->GetAuthenticated() == false || client->GetNick().empty() || client->GetUser().empty()) {
-        std::string errorMessage = ":localhost 421 " + client->GetName()  + " NICK :Need to be logged in\r\n";
-        if (select.CanWrite(client->GetRemote()->Get()))
-            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+    if (currentLine.empty()) {
+        std::cerr << "Error: currentLine is empty!" << std::endl;
         return;
     }
-    
-    if (channelName.empty()) {
-        std::string errorMessage = ":localhost 461 " + client->GetNick() + " MODE :Not enough parameters\r\n";
-        if (select.CanWrite(client->GetRemote()->Get()))
-            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+
+    std::istringstream iss(currentLine);
+    std::string command, channelName, modes, mdp;
+    std::getline(iss, command, ' ');
+
+    if (!std::getline(iss, channelName, ' ') || channelName.empty()) {
+        std::cerr << "Error: Invalid or empty channel name!" << std::endl;
         return;
     }
 
     Channel* channel = server.FindChannel(channelName);
     if (!channel) {
         std::string errorMessage = ":localhost 403 " + client->GetNick() + " " + channelName + " :No such channel\r\n";
+        std::cout << "DEBUG: Channel not found: " << errorMessage << std::endl;
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+    
+    if (!std::getline(iss, modes, ' ')) {
+        std::cerr << "Error: Modes string is empty!" << std::endl;
+        return;
+    }
+
+    if (!channel->isOperator(client)) {
+        std::string errorMessage = ":localhost 481 " + client->GetNick() + " :Permission Denied - You're not a channel operator\r\n";
+        std::cout << "DEBUG: " << errorMessage << std::endl;
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
     }
 
-    std::string modeString;
-    ss >> modeString;
-
-    if (modeString.empty() || (modeString[0] != '+' && modeString[0] != '-')) {
-        std::string errorMessage = ":localhost 472 " + client->GetNick() + " :Unknown mode\r\n";
-        if (select.CanWrite(client->GetRemote()->Get()))
-            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
-        return;
-    }
-
-    char sign = modeString[0];
-    for (size_t i = 1; i < modeString.size(); i++) {
-        char mode = modeString[i];
-
+    for (size_t i = 0; i < modes.size(); ++i) {
+        char mode = modes[i];
         switch (mode) {
             case 'i':
-                if (client->isOperator(channel)) {
-                    channel->SetInviteOnly(sign == '+');
-                }
-                break;
-            case 't':
-                if (client->isOperator(channel)) {
-                    channel->setTopicRestricted(sign == '+');
-                }
-                break;
-            case 'k': {
-                std::string modeArg;
-                ss >> modeArg;
-                if (client->isOperator(channel)) {
-                    channel->SetPass(modeArg);
-                }
-                break;
+            if (modes[i - 1] == '+') {
+                channel->SetInviteOnly(true);
+                std::cout << "DEBUG: Channel " << channel->GetName() << " invite-only mode enabled" << std::endl;
+            } else if (modes[i - 1] == '-') {
+                channel->SetInviteOnly(false);
+                std::cout << "DEBUG: Channel " << channel->GetName() << " invite-only mode disabled" << std::endl;
+            } else {
+                std::cerr << "Error: Invalid mode argument for +i" << std::endl;
+                return;
             }
-            case 'o': {
-                std::string targetNick;
-                ss >> targetNick;
-                Client* targetClient = server.getClientByNick(targetNick);
-                if (targetClient && client->isOperator(channel)) {
-                    if (channel->IsAdmin(targetClient)) {
-                        channel->removeOperator(targetClient);
+            break;
+        
+
+            case 'k':  
+                if (modes[i - 1] == '+') {
+                    if (std::getline(iss, mdp)) {
+                        channel->SetPass(mdp);
+                        std::cout << "DEBUG: Channel " << channelName << " requires a password" << std::endl;
                     } else {
-                        channel->AddUser(targetClient);
+                        std::cerr << "Error: No password provided for channel " << channelName << std::endl;
+                        return;
                     }
+                } else if (modes[i - 1] == '-') {
+                    channel->SetPass("");
+                    std::cout << "DEBUG: Channel " << channelName << " no longer requires a password" << std::endl;
                 }
                 break;
-            }
-            case 'l': {
-                std::string modeArg;
-                ss >> modeArg;
-                if (client->isOperator(channel)) {
-                    int limit = std::atoi(modeArg.c_str());
-                    channel->setMaxClients(limit);
+
+            case 'l':
+                if (modes[i - 1] == '+') {
+                    int maxClients;
+                    iss >> maxClients;
+                    channel->setMaxClients(maxClients);
+                    std::cout << "DEBUG: Channel " << channelName << " user limit set to " << maxClients << std::endl;
+                } else if (modes[i - 1] == '-') {
+                    channel->setMaxClients(50);
+                    std::cout << "DEBUG: Channel " << channelName << " user limit removed" << std::endl;
                 }
                 break;
-            }
+
+            case 't':
+                if (modes[i - 1] == '+') {
+                    channel->setTopicRestricted(true);
+                    std::cout << "DEBUG: Channel " << channelName << " topic is now restricted" << std::endl;
+                } else if (modes[i - 1] == '-') {
+                    channel->setTopicRestricted(false);
+                    std::cout << "DEBUG: Channel " << channelName << " topic is no longer restricted" << std::endl;
+                }
+                break;
+
             default:
-                std::string errorMessage = ":localhost 472 " + client->GetNick() + " " + mode + " :Unknown mode\r\n";
-                if (select.CanWrite(client->GetRemote()->Get()))
-                    send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+                std::cerr << "Error: Unknown mode " << mode << " in the mode string!" << std::endl;
                 break;
         }
     }
+    std::string modeResponse = ":" + client->GetNick() + " MODE " + channelName + " :" + modes + "\r\n";
+    std::cout << "DEBUG: MODE response: " << modeResponse << std::endl;
+    if (select.CanWrite(client->GetRemote()->Get())) {
+        send(client->GetRemote()->Get(), modeResponse.c_str(), modeResponse.size(), 0);
+    }
 }
+
 
 
 /******************************************************/
@@ -544,7 +548,8 @@ Req::__NICK(REQ_PARAMS)
 /*                      PASS                          */
 /******************************************************/
 
-void Req::__PASS(REQ_PARAMS)
+void 
+Req::__PASS(REQ_PARAMS)
 {
     UNUSED_REQ_PARAMS;
     if (client->GetAuthenticated()) {

@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:26:14 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/27 14:59:44 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/28 11:04:05 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,12 +100,12 @@ public:
 	std::vector<Client*>&
 	RefInvitations(void);
 
-	bool isBanned(Client *c);
 	bool isInviteOnly() const;
 	bool isInvited(Client* c);
 	bool isFull() const;
 	bool hasKey() const;
 	bool isOperator(Client* client) const;
+	void setOperator(Client* client);
 	bool IsAdmin(Client* client) const;
 	void addOperator(Client* client);
 	void removeOperator(Client* client);
@@ -124,10 +124,9 @@ private:
 	std::vector<Client*>	users;
 	std::vector<Client*>	admin;
 	std::vector<Client*>	invitations;
-	std::vector<Client *>	banned_clients;
 	size_t					max_clients;
 	bool					invite_only;
-	bool					topicRestricted;						
+	bool					topicRestricted;				
 	
 
 public:

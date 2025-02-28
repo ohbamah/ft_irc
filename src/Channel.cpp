@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:34:32 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/27 16:18:15 by claprand         ###   ########.fr       */
+/*   Updated: 2025/02/28 11:39:46 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,12 +163,6 @@ Channel::RefInvitations(void)
 }
 
 bool 
-Channel::isBanned(Client* c)
-{
-	return std::find(banned_clients.begin(), banned_clients.end(), c) != banned_clients.end();
-}
-
-bool 
 Channel::isInviteOnly() const 
 {
 	return invite_only; 
@@ -198,6 +192,21 @@ Channel::isOperator(Client* client) const
 {
 	return std::find(admin.begin(), admin.end(), client) != admin.end();
 }
+
+void 
+Channel::setOperator(Client* client) {
+    if (!client)
+        return;
+
+    for (size_t i = 0; i < admin.size(); i++) 
+	{
+        if (admin[i] == client)
+            return;
+    }
+    admin.push_back(client);
+}
+
+
 
 bool 
 Channel::IsAdmin(Client* client) const {
