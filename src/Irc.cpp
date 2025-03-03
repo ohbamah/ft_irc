@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Irc.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/03 14:49:57 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/03/03 16:36:59 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ Irc::AcceptConnexion(void)
 		this->sync.AddReadReq(localClient->GetRemote()->Get());
 		this->sync.AddWriteReq(localClient->GetRemote()->Get());
 		this->sync.AddExcpReq(localClient->GetRemote()->Get());
-		std::cout << "\e[32m" << "successfuly connected!\e[0m" << std::endl;
+		std::cout << "\e[32m" << "Successfuly connected!\e[0m" << std::endl;
 		// HandleClientConnexion(localClient);
 	}
 	catch (...)

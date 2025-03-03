@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/03 13:43:08 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/03 15:42:59 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,7 +176,9 @@ void Server::sendChanInfos(Client *client, Channel *channel)
     
     if (!listOfMembers.empty())
     listOfMembers.erase(listOfMembers.size() - 1, 1);
-
+    std::string joinMessage = ":" + client->GetNick() + "!" + client->GetNick() + "@localhost JOIN " + channelName + "\r\n";
+    send(client->GetRemote()->Get(), joinMessage.c_str(), joinMessage.size(), 0);
+    
     // Envoie de la réponse RPL_NAMREPLY (353)
     std::string namReply = ":localhost 353 " + nickname + " = " + channelName + " :" + listOfMembers + "\r\n";
     send(client->GetRemote()->Get(), namReply.c_str(), namReply.size(), 0);
