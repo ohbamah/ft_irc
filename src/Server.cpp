@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/27 16:13:01 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/03 13:43:08 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,6 @@ Server::IsNicknameTaken(const std::string& nickname) const
     return false;
 }
 
-
 void 
 Server::Broadcast(const std::string& message, Client* exclude, Select* select)
 {
@@ -134,7 +133,6 @@ Server::BroadcastToChannel(Channel* channel, const std::string& message, Select 
     }
 }
 
-
 Channel* Server::FindChannel(std::string const & name) {
     std::map<std::string, Channel*>::iterator it = channels.find(name);
     if (it != channels.end()) {
@@ -152,15 +150,11 @@ Client* Server::FindClient(const std::string& name) const {
     return NULL;
 }
 
-
 void Server::CreateChannel(const std::string& channelName) {
     
     Channel* newChannel = new Channel(channelName);
     channels[channelName] = newChannel;
 }
-
-
-
 
 void Server::sendChanInfos(Client *client, Channel *channel)
 {
@@ -198,4 +192,14 @@ Client* Server::getClientByNick(const std::string& nick) {
             return clients[i];
     }
     return NULL;
+}
+
+std::vector<Channel*> Server::GetChannelsOfClient(Client* client) {
+    std::vector<Channel*> channelsList;
+    for (std::map<std::string, Channel*>::iterator it = this->channels.begin(); it != this->channels.end(); ++it) {
+        if (it->second->HasClient(client)) {
+            channelsList.push_back(it->second);
+        }
+    }
+    return channelsList;
 }

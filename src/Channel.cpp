@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:34:32 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/28 11:39:46 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/03 13:31:10 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -279,3 +279,16 @@ Channel::broadcastMessage(Client* sender, const std::string& message, Select& se
         }
     }
 }
+
+
+bool 
+Channel::HasClient(Client* client) 
+{
+	for (size_t i = 0; i < users.size(); ++i) {
+		if (users[i] == client) {
+			return true;
+		}
+	}
+	return false;
+}
+	

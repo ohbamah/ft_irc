@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/26 13:29:22 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/03 14:35:19 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,23 @@ Irc::Irc(int port, const char* pass) : server(port, FControl::NonBlock)
 	this->sync.AddReadReq(this->server.Get());
 	this->mdp = pass;
 	server.SetPassword(mdp);
-	while (1)
-	{
-		this->sync.SnapEvents(0);
-		this->HandleClients();
-		if (this->sync.CanRead(this->server.Get()))
-			this->AcceptConnexion();
+	while (1) {
+		try {
+			this->sync.SnapEvents(0);
+			this->HandleClients();
+			
+			if (this->sync.CanRead(this->server.Get())) {
+				this->AcceptConnexion();
+			}
+		} catch (const Select::FatalError& e) {
+			std::cerr << "Select error: " << e.what() << std::endl;
+		} catch (const std::exception& e) {
+			std::cerr << "Unexpected error: " << e.what() << std::endl;
+		} catch (...) {
+			std::cerr << "test\n";
+		}
 	}
+	
 }	
 
 Irc::~Irc()
@@ -59,7 +69,7 @@ Irc::AcceptConnexion(void)
 		this->sync.AddWriteReq(localClient->GetRemote()->Get());
 		this->sync.AddExcpReq(localClient->GetRemote()->Get());
 		std::cout << "\e[32m" << "successfuly connected!\e[0m" << std::endl;
-		//HandleClientConnexion(localClient);
+		// HandleClientConnexion(localClient);
 	}
 	catch (...)
 	{

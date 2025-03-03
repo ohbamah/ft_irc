@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:35:20 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/26 15:46:58 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/03 13:25:47 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,9 @@ public:
 	
 	Client* 
 	FindClient(const std::string& name) const;
+
+	std::vector<Channel*> 
+	GetChannelsOfClient(Client* client);
 	
 private:
 	std::vector<Client*>	clients;

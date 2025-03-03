@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/03 09:44:24 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/03 14:15:51 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,10 @@ Req::nReqfun = REQ_COUNT;
 Str Req::currentLine; 
 
 const Str
-Req::reqname[REQ_COUNT] = {"CAP", "INVITE", "JOIN", "KICK", "MODE", "NICK", "PASS", "TOPIC", "USER", "PRIVMSG"};
+Req::reqname[REQ_COUNT] = {"CAP", "INVITE", "JOIN", "KICK", "MODE", "NICK", "PASS", "TOPIC", "USER", "PRIVMSG", "QUIT"};
 
 void
-(*Req::reqfun[REQ_COUNT])(REQ_PARAMS) = {Req::__CAP, Req::__INVITE, Req::__JOIN, Req::__KICK, Req::__MODE, Req::__NICK, Req::__PASS, Req::__TOPIC, Req::__USER, Req::__PRIVMSG};
+(*Req::reqfun[REQ_COUNT])(REQ_PARAMS) = {Req::__CAP, Req::__INVITE, Req::__JOIN, Req::__KICK, Req::__MODE, Req::__NICK, Req::__PASS, Req::__TOPIC, Req::__USER, Req::__PRIVMSG, Req::__QUIT};
 
 static Str	get_line(char** txt)
 {
@@ -359,7 +359,9 @@ Req::__KICK(REQ_PARAMS)
 /******************************************************/
 /*                      MODE                          */
 /******************************************************/
-void Req::__MODE(REQ_PARAMS)
+
+void 
+Req::__MODE(REQ_PARAMS)
 {
     UNUSED_REQ_PARAMS;
     if (currentLine.empty()) {
@@ -396,7 +398,7 @@ void Req::__MODE(REQ_PARAMS)
         return;
     }
 
-    bool addMode = true; // Définit si on active (+) ou désactive (-)
+    bool addMode = true;
     for (size_t i = 0; i < modes.size(); ++i) {
         char mode = modes[i];
 
@@ -465,9 +467,6 @@ void Req::__MODE(REQ_PARAMS)
         send(client->GetRemote()->Get(), modeResponse.c_str(), modeResponse.size(), 0);
     }
 }
-
-
-
 
 /******************************************************/
 /*                      NICK                          */
@@ -773,6 +772,30 @@ Req::__PRIVMSG(REQ_PARAMS)
         if (select.CanWrite(client->GetRemote()->Get()))
             send(recipient->GetRemote()->Get(), msgToSend.c_str(), msgToSend.size(), 0);
     }
+}
+
+/******************************************************/
+/*                      PRIVMSG                       */
+/******************************************************/
+void 
+Req::__QUIT(REQ_PARAMS)
+{
+    UNUSED_REQ_PARAMS;
+    
+    std::string quitMessage = ":" + client->GetNick() + " QUIT :Client exited\r\n";
+    std::vector<Channel*> userChannels = server.GetChannelsOfClient(client);
+    
+    for (size_t i = 0; i < userChannels.size(); ++i) {
+        server.BroadcastToChannel(userChannels[i], quitMessage, &select);
+    }
+
+    int clientFd = client->GetRemote()->Get();
+
+    select.RemoveExcpReq(clientFd);
+    select.RemoveReadReq(clientFd);
+    select.RemoveWriteReq(clientFd);
+
+    server.Disconnect(client);
 }
 
 

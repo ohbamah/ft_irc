@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:26:14 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/28 11:04:05 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/03 13:30:58 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,8 @@ public:
     void setMaxClients(int limit);
 	void SetInviteOnly(bool value);
 	void broadcastMessage(Client* sender, const std::string& message, Select& select);
+	bool HasClient(Client* client);
+	
 	
 private: 
 	Str						name;
