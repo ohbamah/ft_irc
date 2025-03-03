@@ -6,7 +6,7 @@
 #    By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/13 16:21:19 by ymanchon          #+#    #+#              #
-#    Updated: 2025/02/19 15:19:00 by ymanchon         ###   ########.fr        #
+#    Updated: 2025/03/03 14:43:03 by ymanchon         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,7 +45,7 @@ SRCS =	./src/Irc.cpp \
 		./src/Select.cpp \
 		./main.cpp
 
-OBJS_DIR = objs
+OBJS_DIR = .objs
 
 OBJS = $(SRCS:%.cpp=$(OBJS_DIR)/%.obj)
 

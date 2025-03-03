@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Req.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/03 14:15:51 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/03 14:50:41 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -794,7 +794,9 @@ Req::__QUIT(REQ_PARAMS)
     select.RemoveExcpReq(clientFd);
     select.RemoveReadReq(clientFd);
     select.RemoveWriteReq(clientFd);
-
+    for (unsigned long i = 0 ; i < channels.size() ; ++i)
+        if (channels[i].IsMember(client))
+            channels[i].RevokeUser(client);
     server.Disconnect(client);
 }
 

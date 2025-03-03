@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:34:32 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/03 13:31:10 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/03 14:48:58 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ Channel::RevokeUser(Client* c)
     if (it != this->users.end())
     {
         this->users.erase(it);
-        
+
         std::vector<Client*>::iterator adminIt = std::find(this->admin.begin(), this->admin.end(), c);
         if (adminIt != this->admin.end())
             this->admin.erase(adminIt);
@@ -79,10 +79,11 @@ Channel::RevokeUser(Client* c)
         throw Channel::UserNotFound();
 }
 
+// equivalent to RevokeUser
 void
 Channel::KickUser(Client* c)
 {
-	(void)c;	
+	this->RevokeUser(c);	
 }
 void
 Channel::InviteUser(Client* c)
