@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:21:34 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/20 15:42:13 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/04 15:31:56 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static void	no_args(void)
 static void	signal_handle(int signum)
 {
 	(void)signum;
-	std::exit(130);
+	Irc::exitReq = true;
 }
 
 int	main(int ac, char** av)
@@ -29,6 +29,12 @@ int	main(int ac, char** av)
 	if (ac != 3)
 		no_args();
 	else
-		Irc	irc(std::atoi(av[1]), av[2]);
+	{
+		try {
+			Irc	irc(std::atoi(av[1]), av[2]);
+		} catch (std::exception& e) {
+			std::cout << e.what() << std::endl;
+		}
+	}
 	return (0);
 }

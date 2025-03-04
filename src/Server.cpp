@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/03 15:42:59 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/04 15:21:46 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,12 @@
 Server::Server(int port, int pFControlFlags) : Socket(Socket::AddrFamily::IPv4, Socket::Type::TCP, Socket::Protocol::Auto)
 {
 	this->Socket::SetOptions(SO_REUSEADDR | SO_REUSEPORT);
-	this->Socket::Bind(port);
-	FControl::SetFlags(this->Socket::Get(), pFControlFlags);
+    try {
+	    this->Socket::Bind(port);
+	} catch (...)  {
+        std::exit(0);
+    }
+    FControl::SetFlags(this->Socket::Get(), pFControlFlags);
 }
 
 Server::~Server()

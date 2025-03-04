@@ -3,16 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   Irc.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/03 16:36:59 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/04 15:33:13 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Irc.hpp"
 
 #include <sys/select.h>
+
+bool
+Irc::exitReq = false;
 
 Irc::Irc(int port, const char* pass) : server(port, FControl::NonBlock)
 {
@@ -21,7 +24,7 @@ Irc::Irc(int port, const char* pass) : server(port, FControl::NonBlock)
 	this->sync.AddReadReq(this->server.Get());
 	this->mdp = pass;
 	server.SetPassword(mdp);
-	while (1) {
+	while (Irc::exitReq == false) {
 		try {
 			this->sync.SnapEvents(0);
 			this->HandleClients();
@@ -53,13 +56,12 @@ Irc::HandleClientConnexion(Client* local)
 	local->GetRemote()->Recv(message);
 	Req::Check(this->sync, this->server, this->channels, local, message);
 }
-
+#include <errno.h>
 void
 Irc::AcceptConnexion(void)
 {
 	try
 	{
-		std::cout << "\e[34mConnexion...\e[0m" << std::endl;
 		std::stringstream	itos;
 		itos << "client" << this->server.RefClients().size();
 
@@ -68,12 +70,14 @@ Irc::AcceptConnexion(void)
 		this->sync.AddReadReq(localClient->GetRemote()->Get());
 		this->sync.AddWriteReq(localClient->GetRemote()->Get());
 		this->sync.AddExcpReq(localClient->GetRemote()->Get());
-		std::cout << "\e[32m" << "Successfuly connected!\e[0m" << std::endl;
-		// HandleClientConnexion(localClient);
+		std::cout << "\e[32m" << "Connexion reussie!\e[0m" << std::endl;
 	}
 	catch (...)
 	{
-		std::cout << "\e[31mConnexion echouee...\e[0m" << std::endl;
+		if (errno == EAGAIN)
+			std::cout << "\e[31mDéconnexion!\e[0m" << std::endl;
+		else
+			std::cout << "\e[31mConnexion echouee...\e[0m" << std::endl;
 	}
 }
 
@@ -123,7 +127,7 @@ void Irc::HandleClients(void) {
 
             if (bytesReceived <= 0) {
                 this->DisconnectAnyone(this->server.RefClients()[i]);
-                std::cout << "\e[31mDéconnexion!\e[0m\n";
+                //std::cout << "\e[31mDéconnexion!\e[0m\n";
                 i--;
             } else {
                 message[bytesReceived] = '\0';
