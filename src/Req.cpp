@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/04 11:11:44 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/04 11:48:54 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,6 +132,12 @@ Req::__INVITE(REQ_PARAMS)
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
+    }
+
+    if (targetNick == client->GetNick()) {
+        std::string errorMessage = ":localhost 441 " + client->GetNick() + " " + targetNick + " " + channelName + " :You cannot invite yourself\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
     }
 
     Channel* channel = server.FindChannel(channelName);
@@ -360,6 +366,13 @@ Req::__KICK(REQ_PARAMS)
         Client* targetClient = server.FindClient(targetNick);
         if (!targetClient || !channel->IsMember(targetClient)) {
             std::string errorMessage = ":localhost 441 " + client->GetNick() + " " + targetNick + " " + channelName + " :They aren't on that channel\r\n";
+            if (select.CanWrite(client->GetRemote()->Get()))
+                send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+            continue;
+        }
+
+        if (targetNick == client->GetNick()) {
+            std::string errorMessage = ":localhost 441 " + client->GetNick() + " " + targetNick + " " + channelName + " :You cannot kick yourself\r\n";
             if (select.CanWrite(client->GetRemote()->Get()))
                 send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
             continue;
