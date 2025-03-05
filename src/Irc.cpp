@@ -6,7 +6,7 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/04 15:33:13 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/03/05 13:41:53 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,15 @@
 bool
 Irc::exitReq = false;
 
-Irc::Irc(int port, const char* pass) : server(port, FControl::NonBlock)
+Irc::Irc(int port, const char* pass)// : server(port, FControl::NonBlock)
 {
-	this->server.Listen();
+	try {
+		this->server.Start(port, FControl::NonBlock);
+		this->server.Listen();
+	} catch (std::exception& e) {
+		std::cout << e.what() << std::endl;
+		return ;
+	}
 
 	this->sync.AddReadReq(this->server.Get());
 	this->mdp = pass;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:35:20 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/03 13:25:47 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/05 13:36:31 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,12 @@ class Server : private Socket
 	typedef std::string	Str;
 
 public:
+	Server(void);
 	Server(int port, int pFControlFlags);
 	~Server();
+
+	void
+	Start(int port, int pFControlFlags);
 
 	const int&
 	Get(void);

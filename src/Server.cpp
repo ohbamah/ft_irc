@@ -6,26 +6,42 @@
 /*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/04 15:21:46 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/03/05 13:41:19 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "FControl.hpp"
 
+Server::Server(void) : Socket(Socket::AddrFamily::IPv4, Socket::Type::TCP, Socket::Protocol::Auto)
+{
+}
+
 Server::Server(int port, int pFControlFlags) : Socket(Socket::AddrFamily::IPv4, Socket::Type::TCP, Socket::Protocol::Auto)
+{
+    this->Start(port, pFControlFlags);
+}
+
+Server::~Server()
+{
+    for (std::vector<Client*>::iterator it = this->clients.begin() ; it != this->clients.end() ; ++it)
+    {
+        this->clients.erase(it);
+        (*it)->GetRemote()->Close();
+        delete (*it);
+    }
+}
+
+void
+Server::Start(int port, int pFControlFlags)
 {
 	this->Socket::SetOptions(SO_REUSEADDR | SO_REUSEPORT);
     try {
 	    this->Socket::Bind(port);
 	} catch (...)  {
-        std::exit(0);
+        return ;
     }
     FControl::SetFlags(this->Socket::Get(), pFControlFlags);
-}
-
-Server::~Server()
-{
 }
 
 const int&
