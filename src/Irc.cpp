@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/07 15:59:15 by bama             ###   ########.fr       */
+/*   Updated: 2025/03/07 16:17:53 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ Irc::AcceptConnexion(void)
 	try
 	{
 		std::stringstream	itos;
-		itos << "client" << this->server.RefClients().size();
+		itos << "client" << Server::cpt++;
 
 		std::cout << "accept()\n";
 		this->server.Accept(itos.str());

@@ -6,12 +6,15 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/07 15:59:02 by bama             ###   ########.fr       */
+/*   Updated: 2025/03/07 16:17:42 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "FControl.hpp"
+
+int
+Server::cpt = 0;
 
 Server::Server(void) : Socket(Socket::AddrFamily::IPv4, Socket::Type::TCP, Socket::Protocol::Auto)
 {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:35:20 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/05 13:36:31 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/03/07 16:18:10 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,11 +120,14 @@ public:
 	std::vector<Channel*> 
 	GetChannelsOfClient(Client* client);
 	
+public:
+	static int	cpt; // compteur global, compte le nombre de clients totaux, plus safe pour le nick par défaut
+	
 private:
-	std::vector<Client*>	clients;
-	Str						password;
-	Str						channel;
-	std::map<std::string, Channel *> channels;
+	std::vector<Client*>				clients;
+	Str									password;
+	Str									channel;
+	std::map<std::string, Channel *>	channels;
 
 public:
 	struct CantFindClient : std::exception { inline virtual const char* what(void) const throw() {return ("Client does not exist\n"); } };

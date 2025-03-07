@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/07 16:04:20 by bama             ###   ########.fr       */
+/*   Updated: 2025/03/07 16:23:03 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -563,7 +563,8 @@ Req::__NICK(REQ_PARAMS)
     }
    
     if (spacePos == std::string::npos || spacePos + 1 >= currentLine.length()) {
-        std::string errorMessage = ":localhost 431 " + client->GetName() + " :No nickname given\r\n";
+        //std::string errorMessage = ":localhost 431 " + client->GetName() + " :No nickname given\r\n";
+        std::string errorMessage = ":localhost 431 " + client->GetNick() + " :No nickname given\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
@@ -597,7 +598,8 @@ Req::__PASS(REQ_PARAMS)
 {
     UNUSED_REQ_PARAMS;
     if (client->GetAuthenticated()) {
-        std::string errorMessage = ":localhost 462 " + client->GetName() + " :You may not reregister\r\n";
+        //std::string errorMessage = ":localhost 462 " + client->GetName() + " :You may not reregister\r\n";
+        std::string errorMessage = ":localhost 462 " + client->GetNick() + " :You may not reregister\r\n";
         //server.SendTo(client->GetName(), errorMessage, 512);
 		if (select.CanWrite(client->GetRemote()->Get()))
 			send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
@@ -607,7 +609,8 @@ Req::__PASS(REQ_PARAMS)
     size_t spacePos = currentLine.find_first_of(' ');
     if (spacePos == std::string::npos) {
         spacePos = currentLine.length();
-        std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n";
+        //std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n";
+        std::string errorMessage = ":localhost 461 " + client->GetNick() + " :Not enough parameters\r\n";
         //server.SendTo(client->GetName(), errorMessage, 512);
 		if (select.CanWrite(client->GetRemote()->Get()))
 			send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
@@ -616,7 +619,8 @@ Req::__PASS(REQ_PARAMS)
 
     std::string password = currentLine.substr(spacePos + 1);
     if (password != server.GetPassword()) {
-        std::string errorMessage = ":localhost 464 " + client->GetName() + " :Password incorrect\r\n";
+        //std::string errorMessage = ":localhost 464 " + client->GetName() + " :Password incorrect\r\n";
+        std::string errorMessage = ":localhost 464 " + client->GetNick() + " :Password incorrect\r\n";
         //server.SendTo(client->GetName(), errorMessage, 512);
 		if (select.CanWrite(client->GetRemote()->Get()))
 			send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
@@ -639,7 +643,8 @@ Req::__TOPIC(REQ_PARAMS)
     UNUSED_REQ_PARAMS;
     
     if (client->GetAuthenticated() == false || client->GetNick().empty() || client->GetUser().empty()) {
-        std::string errorMessage = ":localhost 421 " + client->GetName()  + " TOPIC :Need to be logged in\r\n";
+        std::string errorMessage = ":localhost 421 " + client->GetNick()  + " TOPIC :Need to be logged in\r\n";
+        //std::string errorMessage = ":localhost 421 " + client->GetName()  + " TOPIC :Need to be logged in\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
@@ -647,7 +652,8 @@ Req::__TOPIC(REQ_PARAMS)
 
     size_t spacePos = currentLine.find(' ');
     if (spacePos == std::string::npos || spacePos + 1 >= currentLine.length()) {
-       std::string errorMessage = ":localhost 461 " + client->GetName() + " TOPIC :Not enough parameters\r\n";
+        //std::string errorMessage = ":localhost 461 " + client->GetName() + " TOPIC :Not enough parameters\r\n";
+        std::string errorMessage = ":localhost 461 " + client->GetNick() + " TOPIC :Not enough parameters\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
@@ -733,7 +739,8 @@ Req::__USER(REQ_PARAMS)
 
     size_t spacePos = currentLine.find_first_of(' ');
     if (spacePos == std::string::npos) {
-        std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n";
+        //std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n";
+        std::string errorMessage = ":localhost 461 " + client->GetNick() + " :Not enough parameters\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
@@ -741,7 +748,8 @@ Req::__USER(REQ_PARAMS)
 
     size_t secondSpacePos = currentLine.find_first_of(' ', spacePos + 1);
     if (secondSpacePos == std::string::npos) {
-        std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n";
+        //std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n";
+        std::string errorMessage = ":localhost 461 " + client->GetNick() + " :Not enough parameters\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
@@ -749,7 +757,8 @@ Req::__USER(REQ_PARAMS)
 
     size_t thirdSpacePos = currentLine.find_first_of(' ', secondSpacePos + 1);
     if (thirdSpacePos == std::string::npos) {
-        std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n";
+        //std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n";
+        std::string errorMessage = ":localhost 461 " + client->GetNick() + " :Not enough parameters\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
@@ -757,7 +766,8 @@ Req::__USER(REQ_PARAMS)
 
     size_t realnamePos = currentLine.find_first_of(':', thirdSpacePos + 1);
     if (realnamePos == std::string::npos) {
-        std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n";
+        //std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n";
+        std::string errorMessage = ":localhost 461 " + client->GetNick() + " :Not enough parameters\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
@@ -769,7 +779,8 @@ Req::__USER(REQ_PARAMS)
     Str realname = Str(currentLine.begin() + realnamePos + 1, currentLine.end());
 
     if (client->GetUser() != "") {
-        std::string errorMessage = ":localhost 462 " + client->GetName() + " :You may not reregister\r\n";
+        //std::string errorMessage = ":localhost 462 " + client->GetName() + " :You may not reregister\r\n";
+        std::string errorMessage = ":localhost 462 " + client->GetNick() + " :You may not reregister\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
