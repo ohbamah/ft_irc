@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:28:02 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/27 11:30:30 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/07 16:05:44 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,10 @@ Client::Client(Client::Str pName, SocketRemote* pRemote)
 {
 	this->remote = pRemote;
 	this->name = pName;
+	this->nick = pName; // default nick
 	this->realname = "";
 	this->hostname = "";
 	this->servername = "";
-	this->nick = "";
 	this->authenticated = false;
 	this->disconnect = false; 
 }

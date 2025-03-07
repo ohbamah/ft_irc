@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Req.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/04 11:48:54 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/07 16:04:20 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,8 @@ void
 Req::__CAP(REQ_PARAMS)
 {
 	UNUSED_REQ_PARAMS
-	server.SendTo(client->GetName(), "CAP END");
+	//server.SendTo(client->GetName(), "CAP END");
+    server.SendTo(client->GetNick(), "CAP END");
 }
 
 /******************************************************/
@@ -121,7 +122,8 @@ Req::__INVITE(REQ_PARAMS)
     ss >> command >> targetNick >> channelName;
 
     if (client->GetAuthenticated() == false || client->GetNick().empty() || client->GetUser().empty()){
-        std::string errorMessage = ":localhost 421 " + client->GetName()  + " INVITE :Need to be logged in\r\n";
+        //std::string errorMessage = ":localhost 421 " + client->GetName()  + " INVITE :Need to be logged in\r\n";
+        std::string errorMessage = ":localhost 421 " + client->GetNick()  + " INVITE :Need to be logged in\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return ;
@@ -212,7 +214,8 @@ void Req::__JOIN(REQ_PARAMS)
     }
 
     if (client->GetAuthenticated() == false || client->GetNick().empty() || client->GetUser().empty()) {
-        std::string errorMessage = ":localhost 421 " + client->GetName() + " JOIN :Need to be logged in\r\n";
+        //std::string errorMessage = ":localhost 421 " + client->GetName() + " JOIN :Need to be logged in\r\n";
+        std::string errorMessage = ":localhost 421 " + client->GetNick() + " JOIN :Need to be logged in\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
@@ -644,7 +647,7 @@ Req::__TOPIC(REQ_PARAMS)
 
     size_t spacePos = currentLine.find(' ');
     if (spacePos == std::string::npos || spacePos + 1 >= currentLine.length()) {
-        std::string errorMessage = ":localhost 461 " + client->GetName() + " TOPIC :Not enough parameters\r\n";
+       std::string errorMessage = ":localhost 461 " + client->GetName() + " TOPIC :Not enough parameters\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;

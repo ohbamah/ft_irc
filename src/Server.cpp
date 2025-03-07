@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/05 13:41:19 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/03/07 15:59:02 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,8 @@ Server::Start(int port, int pFControlFlags)
 	} catch (...)  {
         return ;
     }
-    FControl::SetFlags(this->Socket::Get(), pFControlFlags);
+    //FControl::SetFlags(this->Socket::Get(), pFControlFlags);
+    fcntl(this->Socket::Get(), F_SETFL, O_NONBLOCK);
 }
 
 const int&
@@ -82,10 +83,11 @@ Client*
 Server::FindClientByName(const Str& name)
 {
 	for (unsigned long i = 0 ; i < this->clients.size() ; ++i)
-		if (!this->clients[i]->GetName().compare(name))
+		if (!this->clients[i]->GetNick().compare(name))
 			return (this->clients[i]);
 	throw (Server::CantFindClient());
 }
+
 void
 Server::SetPassword(std::string pass)
 {

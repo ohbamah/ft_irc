@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Select.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 15:18:24 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 17:20:41 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/03/07 15:53:48 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,9 @@ public:
 	RemoveExcpReq(int fd);
 
 private:
+	int
+	__Max(void);
+
 	void
 	__ResetSets(void);
 
@@ -63,6 +66,7 @@ private:
 
 public:
 	struct FatalError : std::exception { inline virtual const char* what(void) const throw() {return ("Fatal error!"); } };
+	struct NoFDSet : std::exception { inline virtual const char* what(void) const throw() {return ("No FD set..."); } };
 	struct FDNotInSelect : std::exception { inline virtual const char* what(void) const throw() {return ("FD not existing in Select object!"); } };
 };
 

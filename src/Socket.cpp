@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/19 17:20:23 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/03/07 15:30:47 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ Socket::Accept(void)
 	if ((client_fd = accept(this->fd, (sockaddr*)&saddr, &saddr_len)) == -1)
 		throw (Socket::CantAccept());
 
+	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 	char			clientIp[INET_ADDRSTRLEN];
 	SocketRemote*		sr = new SocketRemote(client_fd);
 	inet_ntop(Socket::AddrFamily::IPv4, &saddr.sin_addr, clientIp, INET_ADDRSTRLEN);
