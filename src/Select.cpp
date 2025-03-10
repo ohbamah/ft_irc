@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Select.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 15:18:49 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/07 15:54:11 by bama             ###   ########.fr       */
+/*   Updated: 2025/03/10 14:41:18 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,7 +152,7 @@ int
 Select::__Max(void)
 {
 	int	max;
-	int	tmp;
+	int	tmp = 0;
 
 	if (this->exfd.size() > 0)
 		max = this->exfd[0];

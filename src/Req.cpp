@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/10 14:27:07 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/10 14:40:03 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -770,8 +770,7 @@ Req::__USER(REQ_PARAMS)
         //std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n";
         std::string errorMessage = ":localhost 461 " + client->GetNick() + " :Not enough parameters\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
-            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessa
-ge.size(), 0);
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
     }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/07 16:17:42 by bama             ###   ########.fr       */
+/*   Updated: 2025/03/10 14:41:00 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ Server::~Server()
 void
 Server::Start(int port, int pFControlFlags)
 {
+    (void)pFControlFlags;
 	this->Socket::SetOptions(SO_REUSEADDR | SO_REUSEPORT);
     try {
 	    this->Socket::Bind(port);
