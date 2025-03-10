@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Irc.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/07 16:17:53 by bama             ###   ########.fr       */
+/*   Updated: 2025/03/10 11:30:58 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,9 +71,7 @@ Irc::AcceptConnexion(void)
 		std::stringstream	itos;
 		itos << "client" << Server::cpt++;
 
-		std::cout << "accept()\n";
 		this->server.Accept(itos.str());
-		std::cout << "accept finished()\n";
 
 		Client*	localClient = this->server.FindClientByName(itos.str()); // ByNickName
 		this->sync.AddReadReq(localClient->GetRemote()->Get());

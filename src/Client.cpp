@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:28:02 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/07 16:05:44 by bama             ###   ########.fr       */
+/*   Updated: 2025/03/10 11:21:02 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ Client::Client(Client::Str pName, SocketRemote* pRemote)
 	this->hostname = "";
 	this->servername = "";
 	this->authenticated = false;
-	this->disconnect = false; 
+	this->disconnect = false;
+	this->hasSetNick = false;
 }
 
 Client::~Client()
@@ -117,4 +118,15 @@ bool
 Client::isOperator(Channel* channel)
 {
     return std::find(operatorChannels.begin(), operatorChannels.end(), channel) != operatorChannels.end();
+}
+bool 
+Client::HasSetNick() const
+{ 
+	return hasSetNick; 
+}
+
+void 
+Client::MarkNickAsSet() 
+{ 
+	hasSetNick = true; 
 }
