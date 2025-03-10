@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:25:46 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/27 13:08:38 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/10 10:54:54 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,11 @@ public:
 	SetAuthenticated(bool authenticated);
 	bool 
 	isOperator(Channel* channel);
+	void 
+	MarkNickAsSet();
+	bool 
+	HasSetNick() const;
+
 
 private:
 	SocketRemote*	remote;
@@ -69,6 +74,7 @@ private:
 	Str				servername;
 	bool			disconnect;
 	bool 			authenticated;
+	bool			hasSetNick;
 	std::vector<Channel*> operatorChannels; 
 };
 

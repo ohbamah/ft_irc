@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/04 11:48:54 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/10 11:14:38 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -248,7 +248,7 @@ void Req::__JOIN(REQ_PARAMS)
     for (size_t i = 0; i < channelNames.size(); i++) {
         std::string channelName = channelNames[i];
         std::string key = (i < keys.size()) ? keys[i] : "";
-
+    
         if (!isValidChannelName(channelName)) {
             std::string errorMessage = ":localhost 403 " + client->GetNick() + " " + channelName + " :No such channel\r\n";
             if (select.CanWrite(client->GetRemote()->Get()))
@@ -260,7 +260,9 @@ void Req::__JOIN(REQ_PARAMS)
         if (!channel) {
             server.CreateChannel(channelName);
             channel = server.FindChannel(channelName);
-            
+            if (!key.empty()) {
+                channel->SetPass(key);
+            }
             try {
                 channel->AddUser(client);
                 std::cout << GREEN << client->GetNick() << " has created and joined channel " << channelName << RESET << std::endl;
@@ -577,9 +579,10 @@ Req::__NICK(REQ_PARAMS)
     if (oldNick.empty())
         oldNick = client->GetName();
     client->SetNick(newNick);
-    std::cout << GREEN << oldNick << " updated: client0 is now known as " << newNick << "!" << RESET << std::endl;
+    client->MarkNickAsSet();
+    std::cout << GREEN << oldNick << " updated: " << oldNick << " is now known as " << newNick << "!" << RESET << std::endl;
 
-    if (client->GetAuthenticated() == true && !client->GetUser().empty()) {
+    if (client->GetAuthenticated() == true && !client->GetUser().empty() && !oldNick.empty()) {
         if (select.CanWrite(client->GetRemote()->Get()))
             sendWelcomeMessages(client, select);
         }
@@ -777,7 +780,7 @@ Req::__USER(REQ_PARAMS)
     client->SetHostname(hostname);
     client->SetServername(servername);
 
-    if (client->GetAuthenticated() == true && !client->GetNick().empty()) {
+    if (client->GetAuthenticated() == true && client->HasSetNick()) {
         if (select.CanWrite(client->GetRemote()->Get()))
             sendWelcomeMessages(client, select);;
         

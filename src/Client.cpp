@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:28:02 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/27 11:30:30 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/10 10:55:17 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ Client::Client(Client::Str pName, SocketRemote* pRemote)
 	this->servername = "";
 	this->nick = "";
 	this->authenticated = false;
-	this->disconnect = false; 
+	this->disconnect = false;
+	this->hasSetNick = false;
 }
 
 Client::~Client()
@@ -117,4 +118,15 @@ bool
 Client::isOperator(Channel* channel)
 {
     return std::find(operatorChannels.begin(), operatorChannels.end(), channel) != operatorChannels.end();
+}
+bool 
+Client::HasSetNick() const
+{ 
+	return hasSetNick; 
+}
+
+void 
+Client::MarkNickAsSet() 
+{ 
+	hasSetNick = true; 
 }
