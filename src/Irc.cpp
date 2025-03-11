@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/10 11:30:58 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/11 13:14:04 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,7 @@ void Irc::HandleClients(void) {
                 i--;
             } else {
                 message[bytesReceived] = '\0';
-               // std::cout << "Message reçu : " << message;
+               std::cout << "Message reçu : " << message;
                 Req::Check(this->sync, this->server, this->channels, this->server.RefClients()[i], message);
             }
         }
