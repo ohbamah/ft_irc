@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/10 14:41:00 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/11 15:59:08 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,3 +231,13 @@ std::vector<Channel*> Server::GetChannelsOfClient(Client* client) {
     }
     return channelsList;
 }
+
+void Server::DeleteChannel(const std::string& channelName) {
+    std::map<std::string, Channel*>::iterator it = this->channels.find(channelName);
+    if (it != this->channels.end()) {
+        delete it->second;
+        this->channels.erase(it);
+    }
+}
+
+

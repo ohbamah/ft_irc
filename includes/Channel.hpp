@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:26:14 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/03 13:30:58 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/11 15:56:42 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,8 +106,6 @@ public:
 	bool hasKey() const;
 	bool isOperator(Client* client) const;
 	void setOperator(Client* client);
-	bool IsAdmin(Client* client) const;
-	void addOperator(Client* client);
 	void removeOperator(Client* client);
 	bool isTopicRestricted() const;
     void setTopicRestricted(bool restricted);
@@ -116,6 +114,9 @@ public:
 	void SetInviteOnly(bool value);
 	void broadcastMessage(Client* sender, const std::string& message, Select& select);
 	bool HasClient(Client* client);
+	bool IsEmpty() const;
+	bool IsPermanent() const;
+	void UpdateNick(Client *client, const std::string &newNick);
 	
 	
 private: 
@@ -128,7 +129,8 @@ private:
 	std::vector<Client*>	invitations;
 	size_t					max_clients;
 	bool					invite_only;
-	bool					topicRestricted;				
+	bool					topicRestricted;		
+	bool					isPermanent;	
 	
 
 public:

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:35:20 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/07 16:18:10 by bama             ###   ########.fr       */
+/*   Updated: 2025/03/11 15:20:32 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,9 @@ public:
 
 	std::vector<Channel*> 
 	GetChannelsOfClient(Client* client);
+
+	void 
+	DeleteChannel(const std::string& channelName);
 	
 public:
 	static int	cpt; // compteur global, compte le nombre de clients totaux, plus safe pour le nick par défaut

@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/11 14:50:11 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/11 16:16:13 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,10 @@ Req::nReqfun = REQ_COUNT;
 Str Req::currentLine; 
 
 const Str
-Req::reqname[REQ_COUNT] = {"CAP", "INVITE", "JOIN", "KICK", "MODE", "NICK", "PASS", "TOPIC", "USER", "PRIVMSG", "QUIT", "PART"};
+Req::reqname[REQ_COUNT] = {"CAP", "INVITE", "JOIN", "KICK", "MODE", "NICK", "PASS", "TOPIC", "USER", "PRIVMSG", "QUIT", "PART", "PING", "PONG"};
 
 void
-(*Req::reqfun[REQ_COUNT])(REQ_PARAMS) = {Req::__CAP, Req::__INVITE, Req::__JOIN, Req::__KICK, Req::__MODE, Req::__NICK, Req::__PASS, Req::__TOPIC, Req::__USER, Req::__PRIVMSG, Req::__QUIT, Req::__PART};
+(*Req::reqfun[REQ_COUNT])(REQ_PARAMS) = {Req::__CAP, Req::__INVITE, Req::__JOIN, Req::__KICK, Req::__MODE, Req::__NICK, Req::__PASS, Req::__TOPIC, Req::__USER, Req::__PRIVMSG, Req::__QUIT, Req::__PART, Req::__PING, Req::__PONG};
 
 static Str get_line(char** txt)
 {
@@ -38,40 +38,6 @@ static Str get_line(char** txt)
         
     return ret;
 }
-
-// void 
-// Req::Check(REQ_PARAMS)
-// {
-//     while (!((currentLine = get_line(&req)).empty()))
-//     {
-//         size_t spacePos = currentLine.find_first_of(' ');
-
-//         Str cmd;
-//         if (spacePos == std::string::npos)
-//             cmd = currentLine;
-//         else
-//             cmd = Str(currentLine.begin(), currentLine.begin() + spacePos);
-
-//         Str input;
-//         if (spacePos != std::string::npos && spacePos + 1 < currentLine.length())
-//             input = Str(currentLine.begin() + spacePos + 1, currentLine.end());
-            
-//         bool found = false;
-//         for (int i = 0; i < REQ_COUNT; ++i)
-//         {
-//             if (!reqname[i].compare(cmd))
-//             {
-//                 reqfun[i](REQ_DATA);
-//                 found = true;
-//                 break;
-//             }
-//         }
-
-//         if (!found)
-//             std::cout << RED << "Commande inconnue : " << cmd << RESET << std::endl;
-//     }
-// }
-
 
 void Req::Check(REQ_PARAMS)
 {
@@ -157,28 +123,24 @@ void Req::__CAP(REQ_PARAMS)
 {
     UNUSED_REQ_PARAMS;
     
-    // Extraire le sous-command (LS, LIST, REQ, etc.)
     size_t spacePos = currentLine.find_first_of(' ');
     if (spacePos == std::string::npos || spacePos + 1 >= currentLine.length()) {
-        return; // Format invalide
+        return;
     }
     
     std::string subCommand = currentLine.substr(spacePos + 1);
     
     if (subCommand.find("LS") == 0) {
-        // Répondre avec les capacités supportées
         std::string response = ":localhost CAP * LS :multi-prefix\r\n";
         if (select.CanWrite(client->GetRemote()->Get())) {
             send(client->GetRemote()->Get(), response.c_str(), response.size(), 0);
         }
     }
     else if (subCommand.find("REQ") == 0) {
-        // Le client demande d'activer une capacité
         size_t capStartPos = subCommand.find(":");
         if (capStartPos != std::string::npos) {
             std::string requestedCap = subCommand.substr(capStartPos + 1);
             if (requestedCap == "multi-prefix") {
-                // Accepter la capacité
                 std::string response = ":localhost CAP * ACK :multi-prefix\r\n";
                 if (select.CanWrite(client->GetRemote()->Get())) {
                     send(client->GetRemote()->Get(), response.c_str(), response.size(), 0);
@@ -187,8 +149,6 @@ void Req::__CAP(REQ_PARAMS)
         }
     }
     else if (subCommand == "END") {
-        // Le client a terminé la négociation des capacités
-        // Vous pourriez vouloir marquer quelque chose ici
     }
 }
 
@@ -214,7 +174,6 @@ Req::__INVITE(REQ_PARAMS)
     ss >> command >> targetNick >> channelName;
 
     if (client->GetAuthenticated() == false || client->GetNick().empty() || client->GetUser().empty()){
-        //std::string errorMessage = ":localhost 421 " + client->GetName()  + " INVITE :Need to be logged in\r\n";
         std::string errorMessage = ":localhost 421 " + client->GetNick()  + " INVITE :Need to be logged in\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
@@ -306,7 +265,6 @@ void Req::__JOIN(REQ_PARAMS)
     }
 
     if (client->GetAuthenticated() == false || client->GetNick().empty() || client->GetUser().empty()) {
-        //std::string errorMessage = ":localhost 421 " + client->GetName() + " JOIN :Need to be logged in\r\n";
         std::string errorMessage = ":localhost 421 " + client->GetNick() + " JOIN :Need to be logged in\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
@@ -406,27 +364,36 @@ void Req::__JOIN(REQ_PARAMS)
 /******************************************************/
 //Parameters: <channel> <user> [<comment>]
 
-void 
-Req::__KICK(REQ_PARAMS)
+void Req::__KICK(REQ_PARAMS)
 {
     UNUSED_REQ_PARAMS;
-    std::istringstream iss(currentLine);
-    std::string command, channelName, targetsStr, reason;
     
+    std::istringstream iss(currentLine);
+    std::string command, channelName, targetsStr;
     iss >> command >> channelName >> targetsStr;
-    std::getline(iss, reason);
-    reason.erase(0, reason.find_first_not_of(" \t")); 
-    reason.erase(reason.find_last_not_of(" \t") + 1);
-    if (!reason.empty() && reason[0] == ':')
-        reason = reason.substr(1);
-
+    
+    // Extraction de la raison (tout ce qui suit après le nickname cible)
+    std::string reason;
+    size_t reasonPos = currentLine.find(targetsStr) + targetsStr.length();
+    if (reasonPos < currentLine.length()) {
+        reason = currentLine.substr(reasonPos);
+        reason = reason.substr(reason.find_first_not_of(" \t"));
+        if (!reason.empty() && reason[0] == ':') {
+            reason = reason.substr(1);
+        }
+    }
+    
+    if (reason.empty()) {
+        reason = "No reason given";
+    }
+    
     if (!client->GetAuthenticated() || client->GetNick().empty() || client->GetUser().empty()) {
         std::string errorMessage = ":localhost 421 " + client->GetNick() + " KICK :Need to be logged in\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
     }
-
+    
     Channel* channel = server.FindChannel(channelName);
     if (!channel) {
         std::string errorMessage = ":localhost 403 " + client->GetNick() + " " + channelName + " :No such channel\r\n";
@@ -434,55 +401,53 @@ Req::__KICK(REQ_PARAMS)
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
     }
-
+    
     if (!channel->IsMember(client)) {
         std::string errorMessage = ":localhost 442 " + client->GetNick() + " " + channelName + " :You're not on that channel\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
     }
-
-    if (!channel->IsAdmin(client)) {
+    
+    if (!channel->isOperator(client)) {
         std::string errorMessage = ":localhost 482 " + client->GetNick() + " " + channelName + " :You're not channel operator\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
     }
-
+    
     std::vector<std::string> targetNicks;
     std::stringstream targetStream(targetsStr);
     std::string temp;
-
     while (std::getline(targetStream, temp, ',')) {
         targetNicks.push_back(temp);
     }
-
+    
     for (size_t i = 0; i < targetNicks.size(); i++) {
         std::string targetNick = targetNicks[i];
-
         Client* targetClient = server.FindClient(targetNick);
+        
         if (!targetClient || !channel->IsMember(targetClient)) {
             std::string errorMessage = ":localhost 441 " + client->GetNick() + " " + targetNick + " " + channelName + " :They aren't on that channel\r\n";
             if (select.CanWrite(client->GetRemote()->Get()))
                 send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
             continue;
         }
-
+        
         if (targetNick == client->GetNick()) {
-            std::string errorMessage = ":localhost 441 " + client->GetNick() + " " + targetNick + " " + channelName + " :You cannot kick yourself\r\n";
+            std::string errorMessage = ":localhost 482 " + client->GetNick() + " " + channelName + " :You cannot kick yourself\r\n";
             if (select.CanWrite(client->GetRemote()->Get()))
                 send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
             continue;
         }
-
+        
+        std::string kickMsg = ":" + client->GetNick() + "!" + client->GetUser() + "@localhost KICK " + channelName + " " + targetNick + " :" + reason + "\r\n";
+        
+        channel->broadcastMessage(client, kickMsg, select);
+        
         channel->RevokeUser(targetClient);
-
-        std::string kickMessage = client->GetNick() + " KICK " + channelName + " " + targetNick + " :Goodbye! (" + reason + ")";
-        std::cout << GREEN << kickMessage << RESET << std::endl;
-
-        std::string targetMessage = ":localhost 482 " + targetNick + " " + channelName + " :You have been kicked by " + client->GetNick() + " (" + reason + ")\r\n";
-        if (select.CanWrite(client->GetRemote()->Get()))
-            send(targetClient->GetRemote()->Get(), targetMessage.c_str(), targetMessage.size(), 0);
+        
+        std::cout << GREEN << "User " << targetNick << " was kicked from " << channelName << " by " << client->GetNick() << " (" << reason << ")" << RESET << std::endl;
     }
 }
 
@@ -638,7 +603,6 @@ void Req::__NICK(REQ_PARAMS)
 {
     UNUSED_REQ_PARAMS;
     size_t spacePos = currentLine.find_first_of(' ');
-    std::cout << client->GetAuthenticated() << std::endl;
     
     std::string newNick = currentLine.substr(spacePos + 1);
     if (containsInvalidCharacters(newNick)) {
@@ -661,23 +625,29 @@ void Req::__NICK(REQ_PARAMS)
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
     }
-    
+
     std::string oldNick = client->GetNick();
     if (oldNick.empty())
         oldNick = client->GetName();
-    
+
     client->SetNick(newNick);
     client->MarkNickAsSet();
+    
     std::cout << GREEN << oldNick << " updated: " << oldNick << " is now known as " << newNick << "!" << RESET << std::endl;
-    
-    if (select.CanWrite(client->GetRemote()->Get())) {
-        if (oldNick.empty() || oldNick == client->GetName()) {
-        } else {
-            std::string nickMsg = ":" + oldNick + "!" + client->GetUser() + "@localhost NICK :" + newNick + "\r\n";
-            send(client->GetRemote()->Get(), nickMsg.c_str(), nickMsg.size(), 0);
-        }
+
+    std::string nickMsg = ":" + oldNick + "!" + client->GetUser() + "@localhost NICK :" + newNick + "\r\n";
+
+    std::vector<Channel *> clientChannels = server.GetChannelsOfClient(client);
+    for (size_t i = 0; i < clientChannels.size(); i++) {
+        Channel *channel = clientChannels[i];
+        channel->broadcastMessage(client, nickMsg, select);
+        channel->UpdateNick(client, newNick);
     }
-    
+
+    if (select.CanWrite(client->GetRemote()->Get())) {
+        send(client->GetRemote()->Get(), nickMsg.c_str(), nickMsg.size(), 0);
+    }
+
     if (client->GetAuthenticated() && !client->GetUser().empty()) {
         if (select.CanWrite(client->GetRemote()->Get())) {
             sendWelcomeMessages(client, select);
@@ -907,18 +877,17 @@ Req::__USER(REQ_PARAMS)
 /******************************************************/
 /*                      PRIVMSG                       */
 /******************************************************/
-void 
-Req::__PRIVMSG(REQ_PARAMS) 
+void Req::__PRIVMSG(REQ_PARAMS) 
 {
     UNUSED_REQ_PARAMS;
     if (!client)
         return;
 
     if (client->GetAuthenticated() == false || client->GetNick().empty() || client->GetUser().empty()){
-        std::string errorMessage = ":localhost 421 " + client->GetNick()  + " KICK :Need to be logged in\r\n";
+        std::string errorMessage = ":localhost 421 " + client->GetNick() + " KICK :Need to be logged in\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
-        return ;
+        return;
     }
 
     std::stringstream ss(currentLine);
@@ -932,7 +901,7 @@ Req::__PRIVMSG(REQ_PARAMS)
         std::string errorMessage = ":localhost 411 " + client->GetNick() + " :No recipient or text to send\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
-        return ;
+        return;
     }
 
     std::string trimmedTarget = target;
@@ -958,7 +927,14 @@ Req::__PRIVMSG(REQ_PARAMS)
                 if (select.CanWrite(client->GetRemote()->Get()))
                     send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
             } else {
-                server.Broadcast(":" + client->GetNick() + " PRIVMSG " + target + " " + message + "\r\n", client, &select);
+                if (channel->HasClient(client)) {
+                    std::string errorMessage = ":" + client->GetNick() + " PRIVMSG " + target + " " + message + "\r\n";
+                    channel->broadcastMessage(client, errorMessage, select);
+                } else {
+                    std::string errorMessage = ":localhost 442 " + client->GetNick() + " " + target + " :You're not on that channel\r\n";
+                    if (select.CanWrite(client->GetRemote()->Get()))
+                        send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+                }
             }
         } else {
             Client* recipient = server.getClientByNick(target);
@@ -1026,7 +1002,6 @@ void Req::__PART(REQ_PARAMS)
     }
     
     std::string params = currentLine.substr(spacePos + 1);
-    
     std::string channelName;
     std::string partMessage = "Leaving";
     
@@ -1062,13 +1037,50 @@ void Req::__PART(REQ_PARAMS)
     
     channel->RevokeUser(client);
     
-    // // Si le canal est vide et qu'il n'est pas permanent, le supprimer
-    // if (channel->IsEmpty() && !channel->IsPermanent()) {
-    //     server.DeleteChannel(channelName);
-    // }
+    if (channel->IsEmpty() && !channel->IsPermanent()) {
+        server.DeleteChannel(channelName);
+    }
     
     std::cout << GREEN << client->GetNick() << " left channel " << channelName << RESET << std::endl;
 }
+
+/******************************************************/
+/*                      PING                          */
+/******************************************************/
+void Req::__PING(REQ_PARAMS) {
+    UNUSED_REQ_PARAMS;
+
+    size_t spacePos = currentLine.find_first_of(' ');
+    if (spacePos == std::string::npos) {
+        std::string errorMessage = ":localhost 409 " + client->GetNick() + " :No origin specified\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+
+    Str pingToken = Str(currentLine.begin() + spacePos + 1, currentLine.end());
+
+    std::string pongMessage = ":localhost PONG localhost " + pingToken + "\r\n";
+    if (select.CanWrite(client->GetRemote()->Get()))
+        send(client->GetRemote()->Get(), pongMessage.c_str(), pongMessage.size(), 0);
+}
+
+void Req::__PONG(REQ_PARAMS) {
+    UNUSED_REQ_PARAMS;
+
+    size_t spacePos = currentLine.find_first_of(' ');
+    if (spacePos == std::string::npos) {
+        std::string errorMessage = ":localhost 409 " + client->GetNick() + " :No origin specified\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+
+    Str pongToken = Str(currentLine.begin() + spacePos + 1, currentLine.end());
+
+    std::cout << "PONG received from " << client->GetNick() << ": " << pongToken << std::endl;
+}
+
 
 
 //#define REQ_PARAMS const char* line, Server& server, Client* client

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:34:32 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/03 14:48:58 by ymanchon         ###   ########.fr       */
+/*   Updated: 2025/03/11 16:02:15 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ Channel::Modes::~Modes()
 {
 }
 
-Channel::Channel(const Channel::Str& pName) : name(pName), pass(""), topic(""), max_clients(50), invite_only(false)
+Channel::Channel(const Channel::Str& pName) : name(pName), pass(""), topic(""), max_clients(50), invite_only(false), isPermanent(false)
 {
 }
 
@@ -35,8 +35,6 @@ Channel::~Channel()
 std::string const & Channel::getName() const{
 	return name;
 }
-
-
 
 void
 Channel::Disconnect(Client* c)
@@ -207,28 +205,9 @@ Channel::setOperator(Client* client) {
     admin.push_back(client);
 }
 
-
-
-bool 
-Channel::IsAdmin(Client* client) const {
-    for (std::vector<Client*>::const_iterator it = admin.begin(); it != admin.end(); ++it) {
-        if (*it == client) {
-            return true;
-        }
-    }
-    return false;
-}
-
 void
 Channel::SetPass(Str pass){
 	this->pass = pass;
-}
-
-void
-Channel::addOperator(Client* client) {
-	if (!isOperator(client)) {
-		admin.push_back(client);
-	}
 }
 
 void 
@@ -281,7 +260,6 @@ Channel::broadcastMessage(Client* sender, const std::string& message, Select& se
     }
 }
 
-
 bool 
 Channel::HasClient(Client* client) 
 {
@@ -292,4 +270,22 @@ Channel::HasClient(Client* client)
 	}
 	return false;
 }
-	
+
+bool 
+Channel::IsEmpty() const 
+{
+    return users.empty();
+}
+
+bool
+Channel::IsPermanent() const 
+{
+    return isPermanent;
+}
+
+void Channel::UpdateNick(Client *client, const std::string &newNick) {
+    std::vector<Client*>::iterator it = std::find(users.begin(), users.end(), client);
+    if (it != users.end()) {
+        (*it)->SetNick(newNick);
+    }
+}

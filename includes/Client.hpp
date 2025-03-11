@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:25:46 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/10 11:21:28 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/11 15:50:30 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include "Socket.hpp"
 # include "Channel.hpp"
+#include <map>
 
 class Channel ;
 
@@ -62,6 +63,8 @@ public:
 	HasSetNick() const;
 	void 
 	MarkNickAsSet();
+	std::vector<Channel *> 
+	GetChannels() const;
 	
 private:
 	SocketRemote*	remote;
