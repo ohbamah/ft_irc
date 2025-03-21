@@ -30,6 +30,8 @@ public:
 
 	const Str&
 	GetNick(void) const;
+	const Client::Str&
+	GetHostname(void) const;
 	const Str&
 	GetUser(void) const;
 	const Str&
@@ -65,7 +67,11 @@ public:
 	MarkNickAsSet();
 	std::vector<Channel *> 
 	GetChannels() const;
-	
+	void 
+	AddChannel(Channel* channel);
+	void 
+	RemoveChannel(Channel* channel);
+
 private:
 	SocketRemote*	remote;
 	Str				nick;	// unique
@@ -78,6 +84,7 @@ private:
 	bool 			authenticated;
 	bool			hasSetNick;
 	std::vector<Channel*> operatorChannels; 
+	std::vector<Channel*> channels;
 };
 
 #endif

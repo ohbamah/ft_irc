@@ -233,11 +233,13 @@ std::vector<Channel*> Server::GetChannelsOfClient(Client* client) {
 }
 
 void Server::DeleteChannel(const std::string& channelName) {
-    std::map<std::string, Channel*>::iterator it = this->channels.find(channelName);
-    if (it != this->channels.end()) {
-        delete it->second;
-        this->channels.erase(it);
+    std::cout << "[Server::DeleteChannel] Suppression du channel avec le nom : " << channelName << std::endl;
+
+    std::map<std::string, Channel*>::iterator it = channels.find(channelName);
+    if (it != channels.end()) {
+        channels.erase(it);
+        std::cout << "[Server::DeleteChannel] Channel " << channelName << " supprimé avec succès." << std::endl;
+    } else {
+        std::cout << "[Server::DeleteChannel] Channel " << channelName << " non trouvé." << std::endl;
     }
 }
-
-

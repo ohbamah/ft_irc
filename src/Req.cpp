@@ -318,6 +318,7 @@ void Req::__JOIN(REQ_PARAMS)
             }
             try {
                 channel->AddUser(client);
+                client->AddChannel(channel);
                 std::cout << GREEN << client->GetNick() << " has created and joined channel " << channelName << RESET << std::endl;
                 channel->ElevateUser(client);
             } catch (const Channel::UserAlreadyInChannel& e) {
@@ -348,6 +349,7 @@ void Req::__JOIN(REQ_PARAMS)
 
         try {
             channel->AddUser(client);
+            client->AddChannel(channel);
             std::cout << GREEN << client->GetNick() << " has joined channel " << channelName << RESET << std::endl;
         } catch (const Channel::UserAlreadyInChannel& e) {}
 
@@ -358,6 +360,7 @@ void Req::__JOIN(REQ_PARAMS)
             server.sendChanInfos(client, channel);
     }
 }
+
 
 /******************************************************/
 /*                      KICK                          */
@@ -604,16 +607,25 @@ void Req::__NICK(REQ_PARAMS)
     UNUSED_REQ_PARAMS;
     size_t spacePos = currentLine.find_first_of(' ');
     
-    std::string newNick = currentLine.substr(spacePos + 1);
-    if (containsInvalidCharacters(newNick)) {
-        std::string errorMessage = ":localhost 432 " + newNick + " :Erroneous nickname\r\n";
+    // Check if a nickname was provided
+    if (spacePos == std::string::npos || spacePos + 1 >= currentLine.length()) {
+        std::string errorMessage = ":localhost 431 " + client->GetNick() + " :No nickname given\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
     }
     
-    if (spacePos == std::string::npos || spacePos + 1 >= currentLine.length()) {
-        std::string errorMessage = ":localhost 431 " + client->GetNick() + " :No nickname given\r\n";
+    std::string newNick = currentLine.substr(spacePos + 1);
+    // Remove any trailing CR/LF or spaces
+    size_t endPos = newNick.find_first_of("\r\n");
+    if (endPos != std::string::npos) {
+        newNick = newNick.substr(0, endPos);
+    }
+    newNick.erase(newNick.find_last_not_of(" \t\r\n") + 1);
+    
+    // Validate nickname
+    if (containsInvalidCharacters(newNick)) {
+        std::string errorMessage = ":localhost 432 " + newNick + " :Erroneous nickname\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
@@ -626,17 +638,32 @@ void Req::__NICK(REQ_PARAMS)
         return;
     }
 
+    // Get old nick, ensuring it's never empty
     std::string oldNick = client->GetNick();
-    if (oldNick.empty())
+    if (oldNick.empty()) {
         oldNick = client->GetName();
+        if (oldNick.empty()) {
+            oldNick = "*"; // Standard IRC placeholder for unknown/unregistered users
+        }
+    }
+
+    // Always ensure client has a valid hostname for Irssi's nicklist
+    std::string hostname = client->GetHostname();
+    if (hostname.empty()) {
+        hostname = "localhost"; // Default hostname if not set
+        client->SetHostname(hostname);
+    }
 
     client->SetNick(newNick);
     client->MarkNickAsSet();
     
     std::cout << GREEN << oldNick << " updated: " << oldNick << " is now known as " << newNick << "!" << RESET << std::endl;
 
-    std::string nickMsg = ":" + oldNick + "!" + client->GetUser() + "@localhost NICK :" + newNick + "\r\n";
+    // Ensure the prefix includes username AND hostname as per RFC 2812
+    std::string userPrefix = client->GetUser().empty() ? "unknown" : client->GetUser();
+    std::string nickMsg = ":" + oldNick + "!" + userPrefix + "@" + hostname + " NICK :" + newNick + "\r\n";
 
+    // Broadcast to all channels
     std::vector<Channel *> clientChannels = server.GetChannelsOfClient(client);
     for (size_t i = 0; i < clientChannels.size(); i++) {
         Channel *channel = clientChannels[i];
@@ -644,15 +671,19 @@ void Req::__NICK(REQ_PARAMS)
         channel->UpdateNick(client, newNick);
     }
 
+    // Send confirmation to the client themselves
     if (select.CanWrite(client->GetRemote()->Get())) {
         send(client->GetRemote()->Get(), nickMsg.c_str(), nickMsg.size(), 0);
     }
-
-    if (client->GetAuthenticated() && !client->GetUser().empty()) {
-        if (select.CanWrite(client->GetRemote()->Get())) {
-            sendWelcomeMessages(client, select);
-        }
-    }
+    
+    // If this is the first time setting a nick and user info is complete, send welcome
+    // if (client->IsFirstNick() && !client->GetUser().empty() && !client->GetAuthenticated()) {
+    //     client->SetFirstNick(false);
+    //     if (select.CanWrite(client->GetRemote()->Get())) {
+    //         sendWelcomeMessages(client, select);
+    //         client->SetAuthenticated(true);
+    //     }
+    //}
 }
 
 /******************************************************/
@@ -796,12 +827,12 @@ void
 Req::__USER(REQ_PARAMS)
 {
     UNUSED_REQ_PARAMS;
-    // if (client->GetAuthenticated() == false) {
-    //     std::string errorMessage = "You may start by command PASS to log in with the password\r\n";
-    //     if (select.CanWrite(client->GetRemote()->Get()))
-    //         send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
-    //     return ;
-    // }
+    if (client->GetAuthenticated() == false) {
+        std::string errorMessage = "You may start by command PASS to log in with the password\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return ;
+    }
 
     size_t spacePos = currentLine.find_first_of(' ');
     if (spacePos == std::string::npos) {
@@ -955,29 +986,36 @@ void Req::__PRIVMSG(REQ_PARAMS)
 /******************************************************/
 /*                      QUIT                          */
 /******************************************************/
-void 
-Req::__QUIT(REQ_PARAMS)
+void Req::__QUIT(REQ_PARAMS)
 {
     UNUSED_REQ_PARAMS;
-    
+
+    if (!client) return;
+
     std::string quitMessage = ":" + client->GetNick() + " QUIT :Client exited\r\n";
     std::vector<Channel*> userChannels = server.GetChannelsOfClient(client);
-    
-    for (size_t i = 0; i < userChannels.size(); ++i) {
-        server.BroadcastToChannel(userChannels[i], quitMessage, &select);
+
+    for (std::vector<Channel*>::iterator it = userChannels.begin(); it != userChannels.end(); ++it) {
+        if (*it)
+            server.BroadcastToChannel(*it, quitMessage, &select);
     }
 
     int clientFd = client->GetRemote()->Get();
+    if (clientFd) {
+        select.RemoveExcpReq(clientFd);
+        select.RemoveReadReq(clientFd);
+        select.RemoveWriteReq(clientFd);
+    }
 
-    select.RemoveExcpReq(clientFd);
-    select.RemoveReadReq(clientFd);
-    select.RemoveWriteReq(clientFd);
-    for (unsigned long i = 0 ; i < channels.size() ; ++i)
-        if (channels[i].IsMember(client))
-            channels[i].RevokeUser(client);
+    for (std::vector<Channel>::iterator it = channels.begin(); it != channels.end(); ++it) {
+        if (it->IsMember(client)) {
+            it->RevokeUser(client);
+        }
+    }
     server.Disconnect(client);
-    std::cout << RED << "Deconnexion!" << RESET << std::endl;
+    std::cout << RED << "Déconnexion!" << RESET << std::endl;
 }
+
 
 /******************************************************/
 /*                      PART                          */
@@ -1035,7 +1073,8 @@ void Req::__PART(REQ_PARAMS)
     
     channel->broadcastMessage(client, partMsg, select);
     
-    channel->RevokeUser(client);
+    //channel->RevokeUser(client);
+    channel->RemoveClientChannel(client, server);
     
     if (channel->IsEmpty() && !channel->IsPermanent()) {
         server.DeleteChannel(channelName);

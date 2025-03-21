@@ -289,3 +289,29 @@ void Channel::UpdateNick(Client *client, const std::string &newNick) {
         (*it)->SetNick(newNick);
     }
 }
+
+size_t Channel::GetClientCount() const {
+    return users.size();
+}
+
+
+void Channel::RemoveClient(Client* client) {
+    std::vector<Client*>& clientList = this->users;
+    
+    for (std::vector<Client*>::iterator it = clientList.begin(); it != clientList.end(); ++it) {
+        if (*it == client) {
+            clientList.erase(it);
+            std::cout << "[Channel::RemoveClient] Client " << client->GetNick() << " retiré de la liste des clients du canal " << this->GetName() << std::endl;
+            break;
+        }
+    }
+}
+
+void Channel::RemoveClientChannel(Client* client, Server& server) {
+    client->RemoveChannel(this);
+    this->RemoveClient(client);
+
+    if (this->GetClientCount() == 0) {  
+        server.DeleteChannel(this->GetName());
+    }
+}

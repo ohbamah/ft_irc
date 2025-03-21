@@ -20,7 +20,9 @@
 # include <iostream>
 # include "Client.hpp"
 # include "Select.hpp"
+# include "Server.hpp"
 
+class Server ;
 class Client ;
 
 class Channel
@@ -117,6 +119,9 @@ public:
 	bool IsEmpty() const;
 	bool IsPermanent() const;
 	void UpdateNick(Client *client, const std::string &newNick);
+	size_t GetClientCount() const;
+	void RemoveClient(Client* client);
+	void RemoveClientChannel(Client* client, Server& server);
 	
 	
 private: 

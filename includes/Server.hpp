@@ -21,7 +21,11 @@
 # include <iomanip>
 # include <iostream>
 # include "Select.hpp"
+# include "Client.hpp"
 # include "Channel.hpp"
+
+class Client ;
+class Channel ;
 
 class Server : private Socket
 {
@@ -122,6 +126,7 @@ public:
 
 	void 
 	DeleteChannel(const std::string& channelName);
+
 	
 public:
 	static int	cpt; // compteur global, compte le nombre de clients totaux, plus safe pour le nick par défaut

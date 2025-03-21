@@ -30,7 +30,7 @@ YELLOW 	= \e[38;2;250;189;0m
 #*   VARIABLES   *#
 # ############### #
 
-NAME = ft_irc
+NAME = ircserv
 
 CXX = @c++
 
