@@ -301,7 +301,6 @@ void Channel::RemoveClient(Client* client) {
     for (std::vector<Client*>::iterator it = clientList.begin(); it != clientList.end(); ++it) {
         if (*it == client) {
             clientList.erase(it);
-            std::cout << "[Channel::RemoveClient] Client " << client->GetNick() << " retiré de la liste des clients du canal " << this->GetName() << std::endl;
             break;
         }
     }

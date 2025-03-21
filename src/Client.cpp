@@ -137,14 +137,9 @@ Client::MarkNickAsSet()
 	hasSetNick = true; 
 }
 
-void Client::AddChannel(Channel* channel) {
-    std::cout << "[Client::AddChannel] Ajout du channel: " << channel->GetName() << std::endl;
-    
+void Client::AddChannel(Channel* channel) {    
     if (std::find(channels.begin(), channels.end(), channel) == channels.end()) {
         channels.push_back(channel);
-        std::cout << "[Client::AddChannel] Channel ajouté avec succès: " << channel->GetName() << std::endl;
-    } else {
-        std::cout << "[Client::AddChannel] Le client est déjà dans ce channel." << std::endl;
     }
 }
 
@@ -152,6 +147,5 @@ void Client::RemoveChannel(Channel* channel) {
     std::vector<Channel*>::iterator it = std::find(channels.begin(), channels.end(), channel);
     if (it != channels.end()) {
         channels.erase(it);
-    } else {
     }
 }
