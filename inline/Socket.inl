@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 02:04:02 by bama              #+#    #+#             */
-/*   Updated: 2025/03/11 13:43:39 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/24 15:13:02 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,10 +58,6 @@ Socket::Recv(T* data, int nbytes)
 		std::cerr << "Erreur recv() : " << strerror(errno) << std::endl;
 		throw (Socket::FailedRecv());
 	}
-
-	std::cout << "Socket::Recv - Bytes reçus: " << bytesRead << " | Message: " 
-              << std::string(reinterpret_cast<char*>(data), bytesRead) << std::endl;
-	
 	return bytesRead;
 }
 

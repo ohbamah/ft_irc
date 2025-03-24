@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/11 15:59:08 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/24 14:38:04 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,3 +239,38 @@ void Server::DeleteChannel(const std::string& channelName) {
         channels.erase(it);
     } 
 }
+
+void Server::RemoveClient(Client* client) {
+    std::vector<Client*>& clientList = this->clients;
+    
+    for (std::vector<Client*>::iterator it = clientList.begin(); it != clientList.end(); ++it) {
+        if (*it == client) {
+            clientList.erase(it);
+            break;
+        }
+    }
+}
+
+void Server::RemoveClientChannel(Client* client, const std::string& channelName) {
+    Channel* channel = NULL;
+    for (std::map<std::string, Channel*>::iterator it = this->channels.begin(); it != this->channels.end(); ++it) {
+        if (it->first == channelName) {
+            channel = it->second;
+            break;
+        }
+    }
+
+    if (channel) {
+        client->RemoveChannel(channel);
+        channel->RevokeUser(client);
+
+
+        if (this->channels.empty()) {
+            DeleteChannel(channel->getName()); 
+        }
+    } else {
+        std::cerr << "Channel not found!" << std::endl;
+    }
+}
+
+

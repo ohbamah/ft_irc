@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:35:20 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/11 15:20:32 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/24 13:26:35 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@
 # include "Client.hpp"
 # include "Channel.hpp"
 
-class Client ;
 class Channel ;
 
 class Server : private Socket
@@ -126,6 +125,12 @@ public:
 
 	void 
 	DeleteChannel(const std::string& channelName);
+
+	void 
+	RemoveClientChannel(Client* client, const std::string& channelName);
+
+	void 
+	RemoveClient(Client* client);
 
 	
 public:

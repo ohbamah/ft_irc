@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:34:32 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/11 16:02:15 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/24 14:51:47 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -287,30 +287,5 @@ void Channel::UpdateNick(Client *client, const std::string &newNick) {
     std::vector<Client*>::iterator it = std::find(users.begin(), users.end(), client);
     if (it != users.end()) {
         (*it)->SetNick(newNick);
-    }
-}
-
-size_t Channel::GetClientCount() const {
-    return users.size();
-}
-
-
-void Channel::RemoveClient(Client* client) {
-    std::vector<Client*>& clientList = this->users;
-    
-    for (std::vector<Client*>::iterator it = clientList.begin(); it != clientList.end(); ++it) {
-        if (*it == client) {
-            clientList.erase(it);
-            break;
-        }
-    }
-}
-
-void Channel::RemoveClientChannel(Client* client, Server& server) {
-    client->RemoveChannel(this);
-    this->RemoveClient(client);
-
-    if (this->GetClientCount() == 0) {  
-        server.DeleteChannel(this->GetName());
     }
 }

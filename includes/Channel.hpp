@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:26:14 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/11 15:56:42 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/24 14:58:03 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,9 @@
 # include <iostream>
 # include "Client.hpp"
 # include "Select.hpp"
-# include "Server.hpp"
+//# include "Server.hpp"
 
-class Server ;
+//class Server ;
 class Client ;
 
 class Channel
@@ -119,10 +119,6 @@ public:
 	bool IsEmpty() const;
 	bool IsPermanent() const;
 	void UpdateNick(Client *client, const std::string &newNick);
-	size_t GetClientCount() const;
-	void RemoveClient(Client* client);
-	void RemoveClientChannel(Client* client, Server& server);
-	
 	
 private: 
 	Str						name;
