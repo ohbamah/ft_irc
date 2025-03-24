@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/24 15:26:56 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/24 16:28:22 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,10 @@ Req::nReqfun = REQ_COUNT;
 Str Req::currentLine; 
 
 const Str
-Req::reqname[REQ_COUNT] = {"CAP", "INVITE", "JOIN", "KICK", "MODE", "NICK", "PASS", "TOPIC", "USER", "PRIVMSG", "QUIT", "PART", "PING", "PONG"};
+Req::reqname[REQ_COUNT] = {"CAP", "INVITE", "JOIN", "KICK", "MODE", "NICK", "PASS", "TOPIC", "USER", "PRIVMSG", "QUIT", "PART", "PING", "PONG", "WHO"};
 
 void
-(*Req::reqfun[REQ_COUNT])(REQ_PARAMS) = {Req::__CAP, Req::__INVITE, Req::__JOIN, Req::__KICK, Req::__MODE, Req::__NICK, Req::__PASS, Req::__TOPIC, Req::__USER, Req::__PRIVMSG, Req::__QUIT, Req::__PART, Req::__PING, Req::__PONG};
+(*Req::reqfun[REQ_COUNT])(REQ_PARAMS) = {Req::__CAP, Req::__INVITE, Req::__JOIN, Req::__KICK, Req::__MODE, Req::__NICK, Req::__PASS, Req::__TOPIC, Req::__USER, Req::__PRIVMSG, Req::__QUIT, Req::__PART, Req::__PING, Req::__PONG, Req::__WHO};
 
 static Str get_line(char** txt)
 {
@@ -799,8 +799,6 @@ Req::__TOPIC(REQ_PARAMS)
     server.BroadcastToChannel(channelName, topicChangeMessage, &select);
 }
 
-
-
 /******************************************************/
 /*                      USER                          */
 /******************************************************/
@@ -819,7 +817,6 @@ Req::__USER(REQ_PARAMS)
 
     size_t spacePos = currentLine.find_first_of(' ');
     if (spacePos == std::string::npos) {
-        //std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n";
         std::string errorMessage = ":localhost 461 " + client->GetNick() + " :Not enough parameters\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
@@ -828,7 +825,6 @@ Req::__USER(REQ_PARAMS)
 
     size_t secondSpacePos = currentLine.find_first_of(' ', spacePos + 1);
     if (secondSpacePos == std::string::npos) {
-        //std::string errorMessage = ":localhost 461 " + client->GetName() + " :Not enough parameters\r\n";
         std::string errorMessage = ":localhost 461 " + client->GetNick() + " :Not enough parameters\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
@@ -886,7 +882,6 @@ Req::__USER(REQ_PARAMS)
     std::cout << GREEN << "Authentication successful, " << client->GetNick() << " is now connected." << RESET << std::endl;
     }
 }
-
 
 /******************************************************/
 /*                      PRIVMSG                       */
@@ -965,7 +960,6 @@ void Req::__PRIVMSG(REQ_PARAMS)
     }
 }
 
-
 /******************************************************/
 /*                      QUIT                          */
 /******************************************************/
@@ -996,7 +990,6 @@ void Req::__QUIT(REQ_PARAMS)
     server.Disconnect(client);
     std::cout << RED << "Déconnexion!" << RESET << std::endl;
 }
-
 
 /******************************************************/
 /*                      PART                          */
@@ -1096,6 +1089,73 @@ void Req::__PONG(REQ_PARAMS) {
     std::cout << "PONG received from " << client->GetNick() << ": " << pongToken << std::endl;
 }
 
+/******************************************************/
+/*                      WHO                           */
+/******************************************************/
+
+void Req::__WHO(REQ_PARAMS)
+{
+    UNUSED_REQ_PARAMS;
+    
+    if (!client->GetAuthenticated()) {
+        std::string errorMessage = ":localhost 451 " + client->GetNick() + " :You have not registered\r\n";
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+        return;
+    }
+
+    size_t spacePos = currentLine.find_first_of(' ');
+    std::string target;
+
+    if (spacePos != std::string::npos && spacePos + 1 < currentLine.length()) {
+        target = currentLine.substr(spacePos + 1);
+    } else {
+        target = "*";
+    }
+
+    std::vector<Client*> matchingClients;
+
+    if (!target.empty() && target[0] == '#') {
+        Channel* channel = server.GetChannel(target);
+        if (!channel) {
+            std::string errorMessage = ":localhost 403 " + client->GetNick() + " " + target + " :No such channel\r\n";
+            if (select.CanWrite(client->GetRemote()->Get()))
+                send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+            return;
+        }
+        matchingClients = channel->GetUsers();
+    } 
+    else if (target != "*") {
+        Client* targetClient = server.FindClient(target);
+        if (!targetClient) {
+            std::string errorMessage = ":localhost 401 " + client->GetNick() + " " + target + " :No such nick\r\n";
+            if (select.CanWrite(client->GetRemote()->Get()))
+                send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
+            return;
+        }
+        matchingClients.push_back(targetClient);
+    } 
+    else {
+        matchingClients = server.RefClients(); 
+    }
+
+    for (size_t i = 0; i < matchingClients.size(); ++i) {
+        Client* c = matchingClients[i];
+        std::string response = ":localhost 352 " + client->GetNick() + " " + target + " " + c->GetUser() + " " +
+                               c->GetHostname() + " " + c->GetServername() + " " + c->GetNick() + " :H";
+        if (c->GetAuthenticated()) {
+            response += "@";
+        }
+        response += " 0 " + c->GetName() + "\r\n";
+        
+        if (select.CanWrite(client->GetRemote()->Get()))
+            send(client->GetRemote()->Get(), response.c_str(), response.size(), 0);
+    }
+
+    std::string endMessage = ":localhost 315 " + client->GetNick() + " " + target + " :End of WHO list\r\n";
+    if (select.CanWrite(client->GetRemote()->Get()))
+        send(client->GetRemote()->Get(), endMessage.c_str(), endMessage.size(), 0);
+}
 
 
 //#define REQ_PARAMS const char* line, Server& server, Client* client

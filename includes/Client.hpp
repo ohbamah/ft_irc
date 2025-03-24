@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:25:46 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/11 15:50:30 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/24 16:17:54 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,11 +36,12 @@ public:
 	GetUser(void) const;
 	const Str&
 	GetName(void) const;
+	const Str& 
+	GetServername(void) const;
 	SocketRemote*
 	GetRemote(void) const;
 	bool
 	GetAuthenticated(void) const;
-
 	void
 	Disconnect(void);
 	void

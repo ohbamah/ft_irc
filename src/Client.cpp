@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:28:02 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/11 15:50:53 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/24 16:18:20 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,12 @@ const Client::Str&
 Client::GetUser(void) const
 {
 	return (this->user);
+}
+
+const Client::Str&
+Client::GetServername(void) const
+{
+	return (this->servername);
 }
 
 SocketRemote*

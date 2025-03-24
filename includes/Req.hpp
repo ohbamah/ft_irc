@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:33:17 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/11 15:32:54 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/24 16:20:19 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@
 # define REQ_PARAMS	Select& select, Server& server, std::vector<Channel>& channels, Client* client, char* req
 # define REQ_DATA	select, server, channels, client, req
 # define UNUSED_REQ_PARAMS	(void)select, (void)server; (void)channels, (void)client; (void)req;
-# define REQ_COUNT	14
+# define REQ_COUNT	15
 
 typedef std::string Str;
 
@@ -76,6 +76,8 @@ namespace Req
 	__PING(REQ_PARAMS);
 	void 
 	__PONG(REQ_PARAMS);
+	void
+	__WHO(REQ_PARAMS);
 
 
 	extern const unsigned int	nReqfun;
