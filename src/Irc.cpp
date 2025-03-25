@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/24 15:12:00 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/25 14:15:16 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,44 +82,8 @@ Irc::AcceptConnexion(void)
 	catch (std::exception& e)
 	{
 		std::cout << e.what() << std::endl;
-		//std::cout << "\e[31mConnexion echouee...\e[0m" << std::endl;
 	}
 }
-
-// void
-// Irc::HandleClients(void)
-// {
-// 	char	message[512];
-
-// 	for (unsigned long i = 0 ; i < this->server.RefClients().size() ; ++i)
-// 	{
-// 		try
-// 		{
-// 			std::stringstream	itos;
-// 			itos << i;
-// 			int clientFd = this->server.RefClients()[i]->GetRemote()->Get();
-// 			if (this->sync.Exception(clientFd))
-// 			{
-// 				this->DisconnectAnyone(this->server.RefClients()[i]);
-// 				i = 0;
-// 			}
-// 			else if (this->sync.CanRead(clientFd))
-// 			{
-// 				if (this->server.RecvFrom(i, message, 512) <= 0)
-// 				{
-// 					this->DisconnectAnyone(this->server.RefClients()[i]);
-// 					i = 0;
-// 					std::cout << "\e[31mDeconnexion!\e[0m\n";
-// 					//std::exit(0);
-// 				}
-// 				std::cout << message << std::endl;
-// 			}
-// 		}
-// 		catch (Socket::FailedRecv& e)
-// 		{
-// 		}
-// 	}
-// }
 
 void Irc::HandleClients(void) {
     char message[512];
@@ -136,7 +100,6 @@ void Irc::HandleClients(void) {
                 i--;
             } else {
                 message[bytesReceived] = '\0';
-                //std::cout << "Message reçu : " << message;
                 Req::Check(this->sync, this->server, this->channels, this->server.RefClients()[i], message);
             }
         }

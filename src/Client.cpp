@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:28:02 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/24 16:18:20 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/25 14:12:15 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ Client::Client(Client::Str pName, SocketRemote* pRemote)
 	this->authenticated = false;
 	this->disconnect = false;
 	this->hasSetNick = false;
+	this->invisible = false;
 }
 
 Client::~Client()
@@ -143,15 +144,25 @@ Client::MarkNickAsSet()
 	hasSetNick = true; 
 }
 
-void Client::AddChannel(Channel* channel) {    
+void 
+Client::AddChannel(Channel* channel) 
+{    
     if (std::find(channels.begin(), channels.end(), channel) == channels.end()) {
         channels.push_back(channel);
     }
 }
 
-void Client::RemoveChannel(Channel* channel) {
+void 
+Client::RemoveChannel(Channel* channel) 
+{
     std::vector<Channel*>::iterator it = std::find(channels.begin(), channels.end(), channel);
     if (it != channels.end()) {
         channels.erase(it);
     }
+}
+
+void
+Client::SetInvisible(bool invisible)
+{
+	this->invisible = invisible;
 }

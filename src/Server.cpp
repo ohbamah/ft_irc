@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/24 14:38:04 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/25 14:16:58 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,7 +159,9 @@ Server::BroadcastToChannel(Channel* channel, const std::string& message, Select 
     }
 }
 
-Channel* Server::FindChannel(std::string const & name) {
+Channel* 
+Server::FindChannel(std::string const & name) 
+{
     std::map<std::string, Channel*>::iterator it = channels.find(name);
     if (it != channels.end()) {
         return it->second;
@@ -167,7 +169,9 @@ Channel* Server::FindChannel(std::string const & name) {
     return NULL;
 }
 
-Client* Server::FindClient(const std::string& name) const {
+Client* 
+Server::FindClient(const std::string& name) const 
+{
     for (std::vector<Client*>::const_iterator it = clients.begin(); it != clients.end(); ++it) {
         if ((*it)->GetNick() == name) {
             return *it;
@@ -176,13 +180,16 @@ Client* Server::FindClient(const std::string& name) const {
     return NULL;
 }
 
-void Server::CreateChannel(const std::string& channelName) {
+void 
+Server::CreateChannel(const std::string& channelName) 
+{
     
     Channel* newChannel = new Channel(channelName);
     channels[channelName] = newChannel;
 }
 
-void Server::sendChanInfos(Client *client, Channel *channel)
+void 
+Server::sendChanInfos(Client *client, Channel *channel)
 {
     if (!channel || !client)
         return;
@@ -205,16 +212,16 @@ void Server::sendChanInfos(Client *client, Channel *channel)
     std::string joinMessage = ":" + client->GetNick() + "!" + client->GetNick() + "@localhost JOIN " + channelName + "\r\n";
     send(client->GetRemote()->Get(), joinMessage.c_str(), joinMessage.size(), 0);
     
-    // Envoie de la réponse RPL_NAMREPLY (353)
     std::string namReply = ":localhost 353 " + nickname + " = " + channelName + " :" + listOfMembers + "\r\n";
     send(client->GetRemote()->Get(), namReply.c_str(), namReply.size(), 0);
 
-    // Envoie de la réponse RPL_ENDOFNAMES (366)
     std::string endOfNames = ":localhost 366 " + nickname + " " + channelName + " :End of /NAMES list\r\n";
     send(client->GetRemote()->Get(), endOfNames.c_str(), endOfNames.size(), 0);
 }
 
-Client* Server::getClientByNick(const std::string& nick) {
+Client* 
+Server::getClientByNick(const std::string& nick) 
+{
     for (size_t i = 0; i < clients.size(); ++i) {
         if (clients[i]->GetNick() == nick)
             return clients[i];
@@ -222,7 +229,9 @@ Client* Server::getClientByNick(const std::string& nick) {
     return NULL;
 }
 
-std::vector<Channel*> Server::GetChannelsOfClient(Client* client) {
+std::vector<Channel*> 
+Server::GetChannelsOfClient(Client* client) 
+{
     std::vector<Channel*> channelsList;
     for (std::map<std::string, Channel*>::iterator it = this->channels.begin(); it != this->channels.end(); ++it) {
         if (it->second->HasClient(client)) {
@@ -232,7 +241,9 @@ std::vector<Channel*> Server::GetChannelsOfClient(Client* client) {
     return channelsList;
 }
 
-void Server::DeleteChannel(const std::string& channelName) {
+void 
+Server::DeleteChannel(const std::string& channelName) 
+{
 
     std::map<std::string, Channel*>::iterator it = channels.find(channelName);
     if (it != channels.end()) {
@@ -240,7 +251,9 @@ void Server::DeleteChannel(const std::string& channelName) {
     } 
 }
 
-void Server::RemoveClient(Client* client) {
+void
+Server::RemoveClient(Client* client) 
+{
     std::vector<Client*>& clientList = this->clients;
     
     for (std::vector<Client*>::iterator it = clientList.begin(); it != clientList.end(); ++it) {
@@ -251,7 +264,9 @@ void Server::RemoveClient(Client* client) {
     }
 }
 
-void Server::RemoveClientChannel(Client* client, const std::string& channelName) {
+void 
+Server::RemoveClientChannel(Client* client, const std::string& channelName)
+ {
     Channel* channel = NULL;
     for (std::map<std::string, Channel*>::iterator it = this->channels.begin(); it != this->channels.end(); ++it) {
         if (it->first == channelName) {
@@ -259,17 +274,12 @@ void Server::RemoveClientChannel(Client* client, const std::string& channelName)
             break;
         }
     }
-
     if (channel) {
         client->RemoveChannel(channel);
         channel->RevokeUser(client);
-
-
         if (this->channels.empty()) {
             DeleteChannel(channel->getName()); 
         }
-    } else {
-        std::cerr << "Channel not found!" << std::endl;
     }
 }
 

@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:34:32 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/24 14:51:47 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/25 14:13:21 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,9 @@ Channel::~Channel()
 {
 }
 
-std::string const & Channel::getName() const{
+std::string const & 
+Channel::getName() const
+{
 	return name;
 }
 
@@ -42,7 +44,8 @@ Channel::Disconnect(Client* c)
 	this->KickUser(c);
 }
 
-void Channel::AddUser(Client* c)
+void 
+Channel::AddUser(Client* c)
 {
     if (std::find(this->users.begin(), this->users.end(), c) != this->users.end())
         throw Channel::UserAlreadyInChannel();
@@ -193,7 +196,8 @@ Channel::isOperator(Client* client) const
 }
 
 void 
-Channel::setOperator(Client* client) {
+Channel::setOperator(Client* client) 
+{
     if (!client)
         return;
 
@@ -232,12 +236,14 @@ Channel::setTopicRestricted(bool restricted)
 	topicRestricted = restricted; 
 }
 
-int Channel::getMaxClients() const 
+int 
+Channel::getMaxClients() const 
 { 
 	return max_clients; 
 }
 
-void Channel::setMaxClients(int max) 
+void 
+Channel::setMaxClients(int max) 
 { 
 	max_clients = max; 
 }
@@ -246,6 +252,12 @@ void
 Channel::SetInviteOnly(bool value)
 {
 	this->invite_only = value;
+}
+
+void
+Channel::SetIsBanned(bool value)
+{
+	this->isBanned = value;
 }
 
 void 
@@ -283,9 +295,17 @@ Channel::IsPermanent() const
     return isPermanent;
 }
 
-void Channel::UpdateNick(Client *client, const std::string &newNick) {
+void 
+Channel::UpdateNick(Client *client, const std::string &newNick) 
+{
     std::vector<Client*>::iterator it = std::find(users.begin(), users.end(), client);
     if (it != users.end()) {
         (*it)->SetNick(newNick);
     }
+}
+
+size_t 
+Channel::GetMemberCount() const 
+{
+	return users.size();
 }

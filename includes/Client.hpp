@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:25:46 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/24 16:17:54 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/25 14:14:12 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ public:
 	AddChannel(Channel* channel);
 	void 
 	RemoveChannel(Channel* channel);
+	void
+	SetInvisible(bool invisible);
 
 private:
 	SocketRemote*	remote;
@@ -84,6 +86,7 @@ private:
 	bool			disconnect;
 	bool 			authenticated;
 	bool			hasSetNick;
+	bool			invisible;
 	std::vector<Channel*> operatorChannels; 
 	std::vector<Channel*> channels;
 };

@@ -6,7 +6,7 @@
 /*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 17:26:14 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/24 14:58:03 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/25 14:13:57 by claprand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,7 @@
 # include <iostream>
 # include "Client.hpp"
 # include "Select.hpp"
-//# include "Server.hpp"
 
-//class Server ;
 class Client ;
 
 class Channel
@@ -102,23 +100,44 @@ public:
 	std::vector<Client*>&
 	RefInvitations(void);
 
-	bool isInviteOnly() const;
-	bool isInvited(Client* c);
-	bool isFull() const;
-	bool hasKey() const;
-	bool isOperator(Client* client) const;
-	void setOperator(Client* client);
-	void removeOperator(Client* client);
-	bool isTopicRestricted() const;
-    void setTopicRestricted(bool restricted);
-	int getMaxClients() const;
-    void setMaxClients(int limit);
-	void SetInviteOnly(bool value);
-	void broadcastMessage(Client* sender, const std::string& message, Select& select);
-	bool HasClient(Client* client);
-	bool IsEmpty() const;
-	bool IsPermanent() const;
-	void UpdateNick(Client *client, const std::string &newNick);
+	bool 
+	isInviteOnly() const;
+	bool 
+	isInvited(Client* c);
+	bool 
+	isFull() const;
+	bool 
+	hasKey() const;
+	bool 
+	isOperator(Client* client) const;
+	void 
+	setOperator(Client* client);
+	void 
+	removeOperator(Client* client);
+	bool 
+	isTopicRestricted() const;
+    void 
+	setTopicRestricted(bool restricted);
+	int 
+	getMaxClients() const;
+    void 
+	setMaxClients(int limit);
+	void 
+	SetInviteOnly(bool value);
+	void 
+	broadcastMessage(Client* sender, const std::string& message, Select& select);
+	bool 
+	HasClient(Client* client);
+	bool 
+	IsEmpty() const;
+	bool 
+	IsPermanent() const;
+	void 
+	UpdateNick(Client *client, const std::string &newNick);
+	size_t 
+	GetMemberCount() const;
+	void 
+	SetIsBanned(bool value);
 	
 private: 
 	Str						name;
@@ -131,7 +150,8 @@ private:
 	size_t					max_clients;
 	bool					invite_only;
 	bool					topicRestricted;		
-	bool					isPermanent;	
+	bool					isPermanent;
+	bool					isBanned;
 	
 
 public:
