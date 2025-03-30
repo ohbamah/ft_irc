@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:25:46 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/27 13:08:38 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/31 01:41:47 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,23 @@ public:
 	bool 
 	isOperator(Channel* channel);
 
+	void
+	FlushBuffer(void);
+	unsigned int
+	GetBufferSize(void) const;
+	char*
+	GetMessage(void);
+	char*
+	GetBuffer(void);
+	void
+	ResetBufferIndex(void);
+	void
+	BufferIndexAddBy(unsigned int bytes);
+	void
+	SetBufferIndex(unsigned int bytes);
+	void
+	ResizeBuffer(unsigned int begin, unsigned int end);
+
 private:
 	SocketRemote*	remote;
 	Str				nick;	// unique
@@ -69,7 +86,9 @@ private:
 	Str				servername;
 	bool			disconnect;
 	bool 			authenticated;
-	std::vector<Channel*> operatorChannels; 
+	std::vector<Channel*> operatorChannels;
+	char			message[512];
+	unsigned int	message_index;
 };
 
 #endif

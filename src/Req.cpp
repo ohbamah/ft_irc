@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Req.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/04 11:48:54 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/31 01:47:46 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,23 +32,31 @@ static Str	get_line(char** txt)
 	return (ret);
 }
 
-void 
+void
 Req::Check(REQ_PARAMS)
 {
-    while (!((currentLine = get_line(&req)).empty()))
+    char*       req = client->GetMessage();
+    std::size_t at = 0;
+    //printf("check");
+    while (!((currentLine = Utils::BetterGetline(req)).empty()))
     {
         size_t spacePos = currentLine.find_first_of(' ');
+        printf ("line : %s\n", currentLine.c_str());
+        //if (currentLine.find_first_of('\n') == std::string::npos && currentLine.find_first_of('\v') == std::string::npos && currentLine.find_first_of('\r') == std::string::npos)
+        //    break;
 
         Str cmd;
         if (spacePos == std::string::npos)
-            cmd = currentLine;
+            cmd = Str(currentLine.begin(), currentLine.end() - 1);
         else
             cmd = Str(currentLine.begin(), currentLine.begin() + spacePos);
 
+        printf("cmd %s\n", cmd.c_str());
         Str input;
         if (spacePos != std::string::npos && spacePos + 1 < currentLine.length())
             input = Str(currentLine.begin() + spacePos + 1, currentLine.end());
-            
+
+        at += currentLine.size();
         bool found = false;
         for (int i = 0; i < REQ_COUNT; ++i)
         {
@@ -62,6 +70,16 @@ Req::Check(REQ_PARAMS)
 
         if (!found)
             std::cout << RED << "Commande inconnue : " << cmd << RESET << std::endl;
+    }
+    if (req[at] != '\0')
+    {
+        client->ResizeBuffer(at, std::strlen(&req[at]));
+    }
+    else
+    {
+        printf("!= 0\n");
+        client->FlushBuffer();
+        client->ResetBufferIndex();
     }
 }
 
@@ -441,14 +459,15 @@ Req::__MODE(REQ_PARAMS)
 
         switch (mode) {
             case 'i':
-            if (addMode){
-                channel->SetInviteOnly(addMode);
-                std::cout << GREEN << "This channel is invite-only. You need an invitation to join." << RESET << std::endl;
-                break;
-            } else {
-                channel->SetInviteOnly(addMode);
-                std::cerr << YELLOW << "This channel is not invite-only" << RESET << std::endl;
-            }
+                if (addMode){
+                    channel->SetInviteOnly(addMode);
+                    std::cout << GREEN << "This channel is invite-only. You need an invitation to join." << RESET << std::endl;
+                    break;
+                } else {
+                    channel->SetInviteOnly(addMode);
+                    std::cerr << YELLOW << "This channel is not invite-only" << RESET << std::endl;
+                }
+                break; //!BREAK!
             case 'k':  
                 if (addMode) {
                     if (std::getline(iss, mdp)) {
@@ -462,7 +481,6 @@ Req::__MODE(REQ_PARAMS)
                     channel->SetPass("");
                 }
                 break;
-
             case 'l':
                 if (addMode) {
                     int maxClients;
@@ -473,7 +491,6 @@ Req::__MODE(REQ_PARAMS)
                     channel->setMaxClients(50);
                 }
                 break;
-
             case 't':
                 if (addMode){
                     channel->setTopicRestricted(addMode);
@@ -485,7 +502,7 @@ Req::__MODE(REQ_PARAMS)
                     std::cout << GREEN << "The topic of this channel is NOT restricted to operators only." << RESET << std::endl;
                     break;
                 }
-            
+                break; //!BREAK!
             case 'o':
                 if (std::getline(iss, userNick)) {
                     Client* targetClient = server.FindClient(userNick);
@@ -499,7 +516,6 @@ Req::__MODE(REQ_PARAMS)
                     std::cerr << RED << "Error: No nickname provided for +o/-o" << RESET << std::endl;
                 }
                 break;
-
             default:
                 std::cerr << RED << "Error: Unknown mode." << RESET << std::endl;
                 break;

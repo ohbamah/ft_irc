@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:21:34 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/20 15:42:13 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/31 01:08:22 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,14 @@ int	main(int ac, char** av)
 	if (ac != 3)
 		no_args();
 	else
-		Irc	irc(std::atoi(av[1]), av[2]);
+	{
+		try{
+			Irc	irc(std::atoi(av[1]), av[2]);
+		}
+		catch (...)
+		{
+			std::cout << "Erreur FATAL (probably a binding error).\n";
+		}
+	}
 	return (0);
 }

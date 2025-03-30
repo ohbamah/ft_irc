@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/03 15:42:59 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/31 00:58:15 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@ Server::Server(int port, int pFControlFlags) : Socket(Socket::AddrFamily::IPv4, 
 
 Server::~Server()
 {
+    for (std::map<std::string, Channel*>::iterator it = this->channels.begin() ; it != this->channels.end() ; ++it)
+        delete (it->second);    //! 31/03/2025 (last leaks detected)
 }
 
 const int&

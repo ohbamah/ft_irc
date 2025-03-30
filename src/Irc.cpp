@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Irc.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/03 16:36:59 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/31 01:03:50 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,14 +47,6 @@ Irc::~Irc()
 }
 
 void
-Irc::HandleClientConnexion(Client* local)
-{
-	char	message[512];
-	local->GetRemote()->Recv(message);
-	Req::Check(this->sync, this->server, this->channels, local, message);
-}
-
-void
 Irc::AcceptConnexion(void)
 {
 	try
@@ -69,7 +61,6 @@ Irc::AcceptConnexion(void)
 		this->sync.AddWriteReq(localClient->GetRemote()->Get());
 		this->sync.AddExcpReq(localClient->GetRemote()->Get());
 		std::cout << "\e[32m" << "Successfuly connected!\e[0m" << std::endl;
-		// HandleClientConnexion(localClient);
 	}
 	catch (...)
 	{
@@ -112,14 +103,17 @@ Irc::AcceptConnexion(void)
 // 	}
 // }
 
-void Irc::HandleClients(void) {
-    char message[512];
-
+void Irc::HandleClients(void)
+{
     for (unsigned long i = 0; i < this->server.RefClients().size(); ++i) {
-        int clientFd = this->server.RefClients()[i]->GetRemote()->Get();
+		Client*	client = this->server.RefClients()[i];
+        int clientFd = client->GetRemote()->Get();
 
         if (this->sync.CanRead(clientFd)) {
-            int bytesReceived = this->server.RecvFrom(i, message, sizeof(message) - 1);
+			char*			message = client->GetBuffer();
+			unsigned int	msgsize = client->GetBufferSize();
+            int bytesReceived = this->server.RecvFrom(i, message, msgsize - 1);
+			client->BufferIndexAddBy(bytesReceived);
 
             if (bytesReceived <= 0) {
                 this->DisconnectAnyone(this->server.RefClients()[i]);
@@ -128,7 +122,7 @@ void Irc::HandleClients(void) {
             } else {
                 message[bytesReceived] = '\0';
                // std::cout << "Message reçu : " << message;
-                Req::Check(this->sync, this->server, this->channels, this->server.RefClients()[i], message);
+                Req::Check(this->sync, this->server, this->channels, this->server.RefClients()[i]);
             }
         }
     }

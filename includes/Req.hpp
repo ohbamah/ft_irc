@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Req.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:33:17 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/03 13:16:35 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/31 01:19:27 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 
 # include <istream>
 # include <streambuf>
-# include <cstdlib> 
+# include <cstdlib>
+# include <cstdio>
 # include "Server.hpp"
 # include "Channel.hpp"
 # include "Irc.hpp"
@@ -35,9 +36,9 @@
 
 //class Irc;
 
-# define REQ_PARAMS	Select& select, Server& server, std::vector<Channel>& channels, Client* client, char* req
-# define REQ_DATA	select, server, channels, client, req
-# define UNUSED_REQ_PARAMS	(void)select, (void)server; (void)channels, (void)client; (void)req;
+# define REQ_PARAMS	Select& select, Server& server, std::vector<Channel>& channels, Client* client
+# define REQ_DATA	select, server, channels, client
+# define UNUSED_REQ_PARAMS	(void)select, (void)server; (void)channels, (void)client;
 # define REQ_COUNT	11
 
 typedef std::string Str;

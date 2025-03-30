@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:28:02 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/02/27 11:30:30 by claprand         ###   ########.fr       */
+/*   Updated: 2025/03/31 01:43:33 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@ Client::Client(Client::Str pName, SocketRemote* pRemote)
 	this->nick = "";
 	this->authenticated = false;
 	this->disconnect = false; 
+	this->message_index = 0;
+	this->FlushBuffer();
 }
 
 Client::~Client()
@@ -117,4 +119,53 @@ bool
 Client::isOperator(Channel* channel)
 {
     return std::find(operatorChannels.begin(), operatorChannels.end(), channel) != operatorChannels.end();
+}
+
+void
+Client::FlushBuffer(void)
+{
+	std::memset(this->message, 0, this->GetBufferSize());
+}
+
+unsigned int
+Client::GetBufferSize(void) const
+{
+	return (sizeof this->message);
+}
+
+char*
+Client::GetMessage(void)
+{
+	return (this->message);
+}
+
+char*
+Client::GetBuffer(void)
+{
+	return (&this->message[this->message_index]);
+}
+
+void
+Client::ResetBufferIndex(void)
+{
+	this->message_index = 0;
+}
+
+void
+Client::BufferIndexAddBy(unsigned int bytes)
+{
+	this->message_index += bytes;
+}
+
+void
+Client::ResizeBuffer(unsigned int begin, unsigned int end)
+{
+	memcpy(this->message, &this->message[begin], end - begin);
+	memset(&this->message[begin], 0, end - begin);
+}
+
+void
+Client::SetBufferIndex(unsigned int bytes)
+{
+	this->message_index = bytes;
 }
