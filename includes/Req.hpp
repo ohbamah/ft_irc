@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Req.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:33:17 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/24 16:20:19 by claprand         ###   ########.fr       */
+/*   Updated: 2025/04/02 19:18:24 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include "Channel.hpp"
 # include "Irc.hpp"
 # include "Select.hpp"
+# include "Utils.hpp"
 
 #define DEF_COLOR "\033[0;39m"
 #define GREY "\033[0;90m"
@@ -46,7 +47,7 @@ namespace Req
 {
 	extern Str currentLine;
 	void
-	Check(REQ_PARAMS);
+	Check(Select& select, Server& server, std::vector<Channel>& channels, Client* client);
 
 	void
 	__USER(REQ_PARAMS);

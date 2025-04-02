@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/25 14:16:58 by claprand         ###   ########.fr       */
+/*   Updated: 2025/04/02 23:46:17 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,12 @@ Server::Server(int port, int pFControlFlags) : Socket(Socket::AddrFamily::IPv4, 
 
 Server::~Server()
 {
-    for (std::vector<Client*>::iterator it = this->clients.begin() ; it != this->clients.end() ; ++it)
-    {
-        this->clients.erase(it);
-        (*it)->GetRemote()->Close();
-        delete (*it);
-    }
+    //for (std::vector<Client*>::iterator it = this->clients.begin() ; it != this->clients.end() ; ++it)
+    //{
+    //    this->clients.erase(it);
+    //    (*it)->GetRemote()->Close();
+    //    delete (*it);
+    //}
 }
 
 void

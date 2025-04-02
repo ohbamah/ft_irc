@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Req.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/25 14:26:34 by claprand         ###   ########.fr       */
+/*   Updated: 2025/04/02 23:46:29 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,63 +23,72 @@ Req::reqname[REQ_COUNT] = {"CAP", "INVITE", "JOIN", "KICK", "MODE", "NICK", "PAS
 void
 (*Req::reqfun[REQ_COUNT])(REQ_PARAMS) = {Req::__CAP, Req::__INVITE, Req::__JOIN, Req::__KICK, Req::__MODE, Req::__NICK, Req::__PASS, Req::__TOPIC, Req::__USER, Req::__PRIVMSG, Req::__QUIT, Req::__PART};
 
-static Str get_line(char** txt)
-{
-    Str ret;
-    
-    if (**txt == '\n')
-        (*txt)++;
-    
-    while (**txt && **txt != '\n')
-        ret.push_back(*((*txt)++));
-    
-    if (**txt == '\n')
-        (*txt)++;
-        
-    return ret;
-}
+//static Str get_line(char** txt)
+//{
+//    Str ret;
+//    
+//    if (**txt == '\n')
+//        (*txt)++;
+//    
+//    while (**txt && **txt != '\n')
+//        ret.push_back(*((*txt)++));
+//    
+//    if (**txt == '\n')
+//        (*txt)++;
+//        
+//    return ret;
+//}
 
 void 
-Req::Check(REQ_PARAMS)
+Req::Check(Select& select, Server& server, std::vector<Channel>& channels, Client* client)
 {
-    while (!((currentLine = get_line(&req)).empty()))
-    {
-        if (!currentLine.empty() && currentLine[currentLine.size() - 1] == '\n')
-            currentLine.erase(currentLine.size() - 1);
-        if (!currentLine.empty() && currentLine[currentLine.size() - 1] == '\r')
-            currentLine.erase(currentLine.size() - 1);
+	char*   req = client->GetMessage();
+	bool	enter = false;
 
-        size_t spacePos = currentLine.find(' ');
-        Str cmd;
-        Str input;
+	std::cout << req << std::endl;
+	while (!((currentLine = Utils::Getline(req)).empty()))
+	{
+		enter = true;
+		std::cout << currentLine << std::endl;
+		if (!currentLine.empty() && currentLine[currentLine.size() - 1] == '\n')
+		    currentLine.erase(currentLine.size() - 1);
+		if (!currentLine.empty() && currentLine[currentLine.size() - 1] == '\r')
+		    currentLine.erase(currentLine.size() - 1);
 
-        if (spacePos == std::string::npos)
-        {
-            cmd = currentLine;
-            input = "";
-        }
-        else
-        {
-            cmd = currentLine.substr(0, spacePos);
-            input = currentLine.substr(spacePos + 1);
-        }
-        
-        bool found = false;
-        if (cmd == "PING" || cmd == "PONG" || cmd == "WHO")
-            return;
-        for (int i = 0; i < REQ_COUNT; ++i)
-        {
-            if (!reqname[i].compare(cmd))
-            {
-                reqfun[i](REQ_DATA);
-                found = true;
-                break;
-            }
-        }
-
-        if (!found)
-            std::cout << RED << "Commande inconnue : " << cmd << RESET << std::endl;
-    }
+		size_t spacePos = currentLine.find(' ');
+		Str cmd;
+		Str input;
+			
+		if (spacePos == std::string::npos)
+		{
+		    cmd = currentLine;
+		    input = "";
+		}
+		else
+		{
+		    cmd = currentLine.substr(0, spacePos);
+		    input = currentLine.substr(spacePos + 1);
+		}
+				
+		bool found = false;
+		if (cmd == "PING" || cmd == "PONG" || cmd == "WHO")
+		    return;
+		for (int i = 0; i < REQ_COUNT; ++i)
+		{
+			if (!reqname[i].compare(cmd))
+			{
+			    reqfun[i](REQ_DATA);
+			    found = true;
+			    break;
+			}
+		}
+			
+		if (!found)
+			std::cout << RED << "Commande inconnue : " << cmd << RESET << std::endl;
+		client->ResizeBuffer(currentLine.size());
+	}
+	if (enter == true && (req[0] == '\n' || req[0] == '\r' || req[0] == '\0'))
+		client->FlushBuffer();
 }
 
 
@@ -508,6 +517,7 @@ Req::__MODE(REQ_PARAMS)
             } else {
                 channel->SetInviteOnly(addMode);
             }
+                break; //? Break ?
             case 'k':  
                 if (addMode) {
                     if (std::getline(iss, mdp)) {

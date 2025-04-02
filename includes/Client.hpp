@@ -3,19 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:25:46 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/25 14:14:12 by claprand         ###   ########.fr       */
+/*   Updated: 2025/04/02 23:11:29 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+# define IRC_MSG_SIZE	512
+
 # include "Socket.hpp"
 # include "Channel.hpp"
-#include <map>
+# include <map>
 
 class Channel ;
 
@@ -75,6 +77,25 @@ public:
 	void
 	SetInvisible(bool invisible);
 
+	void
+	FlushBuffer(void);
+	unsigned int
+	GetBufferSpaceAvailable(void) const;
+	char*
+	GetMessage(void);
+	char*
+	GetBuffer(void);
+	void
+	ResetBufferIndex(void);
+	void
+	BufferIndexAddBy(unsigned int bytes);
+	void
+	SetBufferIndex(unsigned int bytes);
+	unsigned int
+	GetBufferIndex(void);
+	void
+	ResizeBuffer(unsigned int end);
+
 private:
 	SocketRemote*	remote;
 	Str				nick;	// unique
@@ -89,6 +110,8 @@ private:
 	bool			invisible;
 	std::vector<Channel*> operatorChannels; 
 	std::vector<Channel*> channels;
+	char			message[IRC_MSG_SIZE];
+	unsigned int	message_index;
 };
 
 #endif

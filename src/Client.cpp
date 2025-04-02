@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:28:02 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/25 14:12:15 by claprand         ###   ########.fr       */
+/*   Updated: 2025/04/02 23:38:22 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ Client::Client(Client::Str pName, SocketRemote* pRemote)
 	this->disconnect = false;
 	this->hasSetNick = false;
 	this->invisible = false;
+	this->FlushBuffer();
 }
 
 Client::~Client()
@@ -165,4 +166,65 @@ void
 Client::SetInvisible(bool invisible)
 {
 	this->invisible = invisible;
+}
+
+void
+Client::FlushBuffer(void)
+{
+	this->message_index = 0;
+	std::memset(this->message, 0, this->GetBufferSpaceAvailable());
+}
+
+// BufferSize available to store data
+// If return value is ONE or ZERO, there is no space available
+unsigned int
+Client::GetBufferSpaceAvailable(void) const
+{
+	return (IRC_MSG_SIZE - this->message_index);
+}
+
+char*
+Client::GetMessage(void)
+{
+	return (this->message);
+}
+
+char*
+Client::GetBuffer(void)
+{
+	return (&this->message[this->message_index]);
+}
+
+void
+Client::ResetBufferIndex(void)
+{
+	this->message_index = 0;
+}
+
+void
+Client::BufferIndexAddBy(unsigned int bytes)
+{
+	this->message_index += bytes;
+}
+
+void
+Client::ResizeBuffer(unsigned int req1_size)
+{
+	char	tmp[IRC_MSG_SIZE] = {0};
+	int		size = strlen(&this->message[req1_size]);
+	std::memcpy(tmp, &this->message[req1_size], size);
+	std::memset(this->message, 0, IRC_MSG_SIZE);
+	std::memcpy(this->message, tmp, size);
+}
+
+unsigned int
+Client::GetBufferIndex(void)
+{
+	return (this->message_index);
+}
+
+void
+Client::SetBufferIndex(unsigned int bytes)
+{
+	this->message_index = bytes;
 }

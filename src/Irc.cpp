@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Irc.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: claprand <claprand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/03/25 14:15:16 by claprand         ###   ########.fr       */
+/*   Updated: 2025/04/02 23:41:28 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ Irc::Irc(int port, const char* pass)// : server(port, FControl::NonBlock)
 	this->sync.AddReadReq(this->server.Get());
 	this->mdp = pass;
 	server.SetPassword(mdp);
-	while (Irc::exitReq == false) {
+	while (Irc::exitReq == false)
+	{
 		try {
 			this->sync.SnapEvents(0);
 			this->HandleClients();
@@ -56,14 +57,6 @@ Irc::~Irc()
 }
 
 void
-Irc::HandleClientConnexion(Client* local)
-{
-	char	message[512];
-	local->GetRemote()->Recv(message);
-	Req::Check(this->sync, this->server, this->channels, local, message);
-}
-
-void
 Irc::AcceptConnexion(void)
 {
 	try
@@ -85,23 +78,39 @@ Irc::AcceptConnexion(void)
 	}
 }
 
-void Irc::HandleClients(void) {
-    char message[512];
+void Irc::HandleClients(void)
+{
+	bool	disconnected;
 
-    for (unsigned long i = 0; i < this->server.RefClients().size(); ++i) {
-        int clientFd = this->server.RefClients()[i]->GetRemote()->Get();
+    for (unsigned long i = 0; i < this->server.RefClients().size(); ++i)
+	{
+		disconnected = false;
+		Client*	client = this->server.RefClients()[i];
+        int		clientFd = client->GetRemote()->Get();
 
-        if (this->sync.CanRead(clientFd)) {
-            int bytesReceived = this->server.RecvFrom(i, message, sizeof(message) - 1);
+        if (this->sync.CanRead(clientFd))
+		{
+			int	bytesReceived;
+			if (client->GetBufferSpaceAvailable() <= 1)
+				disconnected = true;
+			else
+				bytesReceived = this->server.RecvFrom(i, client->GetBuffer(), client->GetBufferSpaceAvailable() - 1);
+			if (client->GetBufferSpaceAvailable() <= 1)
+				disconnected = true;
+			else
+			{
+				client->BufferIndexAddBy(bytesReceived);
+				client->GetBuffer()[0] = '\0';
+			}
 
-            if (bytesReceived <= 0) {
-                this->DisconnectAnyone(this->server.RefClients()[i]);
+            if (bytesReceived <= 0 || disconnected == true)
+			{
+                this->DisconnectAnyone(client);
                 std::cout << "\e[31mDéconnexion!\e[0m\n";
                 i--;
-            } else {
-                message[bytesReceived] = '\0';
-                Req::Check(this->sync, this->server, this->channels, this->server.RefClients()[i], message);
             }
+			else if (disconnected == false)
+                Req::Check(this->sync, this->server, this->channels, client);
         }
     }
 }
