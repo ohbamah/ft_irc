@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:33:17 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/02 19:18:24 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/03 13:37:51 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,9 @@ typedef std::string Str;
 
 namespace Req
 {
-	extern Str currentLine;
+	extern Str 	currentLine;
+	extern bool	disconnected;
+
 	void
 	Check(Select& select, Server& server, std::vector<Channel>& channels, Client* client);
 
@@ -79,7 +81,6 @@ namespace Req
 	__PONG(REQ_PARAMS);
 	void
 	__WHO(REQ_PARAMS);
-
 
 	extern const unsigned int	nReqfun;
 	extern const Str			reqname[REQ_COUNT];

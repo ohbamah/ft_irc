@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/03 11:51:42 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/03 13:39:48 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@ const unsigned int
 Req::nReqfun = REQ_COUNT;
 
 Str Req::currentLine; 
+
+bool
+Req::disconnected = false;
 
 const Str
 Req::reqname[REQ_COUNT] = {"CAP", "INVITE", "JOIN", "KICK", "MODE", "NICK", "PASS", "TOPIC", "USER", "PRIVMSG", "QUIT", "PART"};
@@ -42,18 +45,19 @@ void
 void 
 Req::Check(Select& select, Server& server, std::vector<Channel>& channels, Client* client)
 {
-	char*   req = client->GetMessage();
+	char*	req = client->GetMessage();
 	bool	enter = false;
 
-	//std::cout << "received: " << req << std::endl;
+	//std::cout << "req: \"\e[31m" << req << "\e[0m\"" << std::endl;
 	while (!((currentLine = Utils::Getline(req)).empty()))
 	{
-		std::cout << currentLine << std::endl;
+		Req::disconnected = false;
+		std::cout << "\"\e[33m" << currentLine << "\e[0m\"" << std::endl;
 		enter = true;
 		if (!currentLine.empty() && currentLine[currentLine.size() - 1] == '\n')
-		    currentLine.erase(currentLine.size() - 1);
+			currentLine.erase(currentLine.size() - 1);
 		if (!currentLine.empty() && currentLine[currentLine.size() - 1] == '\r')
-		    currentLine.erase(currentLine.size() - 1);
+			currentLine.erase(currentLine.size() - 1);
 
 		size_t spacePos = currentLine.find(' ');
 		Str cmd;
@@ -69,7 +73,7 @@ Req::Check(Select& select, Server& server, std::vector<Channel>& channels, Clien
 		    cmd = currentLine.substr(0, spacePos);
 		    input = currentLine.substr(spacePos + 1);
 		}
-				
+
 		bool found = false;
 		if (cmd == "PING" || cmd == "PONG" || cmd == "WHO")
 		    return;
@@ -78,24 +82,31 @@ Req::Check(Select& select, Server& server, std::vector<Channel>& channels, Clien
 			if (cmd[0] && !reqname[i].compare(cmd))
 			{
 				reqfun[i](REQ_DATA);
-			    found = true;
-			    break;
+				found = true;
+				break;
 			}
 		}
-			
+		if (disconnected == true)
+			break ;
+
 		if (!found)
 			std::cout << RED << "Commande inconnue : " << cmd << RESET << std::endl;
-		//std::cout << "before resize: " << req << "(current line = " << currentLine << " [" << currentLine.size() << "])" << std::endl;
-		client->ResizeBuffer(currentLine.size() + 1);
+		//std::cout << "before resize: (current line = " << currentLine << " [" << currentLine.size() << "])\n" << req << std::endl;
+		unsigned int i = currentLine.size();
+		//std::cout << "i " << i << "\n";
+		for ( ; req[i] == '\n' || req[i] == '\r' ; ++i)
+			if (req[i] == '\0')
+				break ;
+		client->ResizeBuffer(i);
 		//std::cout << "after resize: " << req << std::endl;
 	}
-	if (enter == true && (req[0] == '\n' || req[0] == '\r' || req[0] == '\0'))
-    {
-        //std::cout << "flushed\n";
+	if (disconnected == false && enter == true && (req[0] == '\n' || req[0] == '\r' || req[0] == '\0'))
+	{
+		//std::cout << "flushed\n";
 		client->FlushBuffer();
 		Utils::ResetGetline();
-    }
-   }
+	}
+}
 
 
 void 
@@ -990,6 +1001,7 @@ Req::__QUIT(REQ_PARAMS)
     }
 
     server.Disconnect(client);
+	Req::disconnected = true;
     std::cout << RED << "Déconnexion!" << RESET << std::endl;
 }
 
