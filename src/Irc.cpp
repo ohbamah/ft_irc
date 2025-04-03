@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/02 23:41:28 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/03 11:35:01 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,15 +82,15 @@ void Irc::HandleClients(void)
 {
 	bool	disconnected;
 
-    for (unsigned long i = 0; i < this->server.RefClients().size(); ++i)
+	for (unsigned long i = 0; i < this->server.RefClients().size(); ++i)
 	{
 		disconnected = false;
 		Client*	client = this->server.RefClients()[i];
-        int		clientFd = client->GetRemote()->Get();
+		int		clientFd = client->GetRemote()->Get();
 
-        if (this->sync.CanRead(clientFd))
+		if (this->sync.CanRead(clientFd))
 		{
-			int	bytesReceived;
+			int	bytesReceived = 0;
 			if (client->GetBufferSpaceAvailable() <= 1)
 				disconnected = true;
 			else
@@ -103,16 +103,16 @@ void Irc::HandleClients(void)
 				client->GetBuffer()[0] = '\0';
 			}
 
-            if (bytesReceived <= 0 || disconnected == true)
+			if (bytesReceived <= 0 || disconnected == true)
 			{
-                this->DisconnectAnyone(client);
-                std::cout << "\e[31mDéconnexion!\e[0m\n";
-                i--;
-            }
+				this->DisconnectAnyone(client);
+				std::cout << "\e[31mDéconnexion!\e[0m\n";
+				i--;
+			}
 			else if (disconnected == false)
-                Req::Check(this->sync, this->server, this->channels, client);
-        }
-    }
+				Req::Check(this->sync, this->server, this->channels, client);
+		}
+	}
 }
 
 void

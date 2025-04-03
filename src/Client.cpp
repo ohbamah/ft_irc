@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:28:02 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/02 23:38:22 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/03 11:39:46 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,7 +172,7 @@ void
 Client::FlushBuffer(void)
 {
 	this->message_index = 0;
-	std::memset(this->message, 0, this->GetBufferSpaceAvailable());
+	std::memset(this->message, 0, IRC_MSG_SIZE);
 }
 
 // BufferSize available to store data

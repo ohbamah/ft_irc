@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 14:19:48 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/02 19:16:38 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/03 11:47:37 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,10 @@ namespace Utils
 	CreateSetfd(int fd);
 	std::string
 	Getline(char*& s);
+	void
+	ResetGetline(void);
 
+	extern std::size_t	at;
 	struct NonExistingPollfd : std::exception { virtual const char* what(void) const throw() { return ("Non-existing pollfd."); }};
 }
 

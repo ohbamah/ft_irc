@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/02 23:46:29 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/03 11:51:42 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,11 @@ Req::Check(Select& select, Server& server, std::vector<Channel>& channels, Clien
 	char*   req = client->GetMessage();
 	bool	enter = false;
 
-	std::cout << req << std::endl;
+	//std::cout << "received: " << req << std::endl;
 	while (!((currentLine = Utils::Getline(req)).empty()))
 	{
-		enter = true;
 		std::cout << currentLine << std::endl;
+		enter = true;
 		if (!currentLine.empty() && currentLine[currentLine.size() - 1] == '\n')
 		    currentLine.erase(currentLine.size() - 1);
 		if (!currentLine.empty() && currentLine[currentLine.size() - 1] == '\r')
@@ -75,9 +75,9 @@ Req::Check(Select& select, Server& server, std::vector<Channel>& channels, Clien
 		    return;
 		for (int i = 0; i < REQ_COUNT; ++i)
 		{
-			if (!reqname[i].compare(cmd))
+			if (cmd[0] && !reqname[i].compare(cmd))
 			{
-			    reqfun[i](REQ_DATA);
+				reqfun[i](REQ_DATA);
 			    found = true;
 			    break;
 			}
@@ -85,11 +85,17 @@ Req::Check(Select& select, Server& server, std::vector<Channel>& channels, Clien
 			
 		if (!found)
 			std::cout << RED << "Commande inconnue : " << cmd << RESET << std::endl;
-		client->ResizeBuffer(currentLine.size());
+		//std::cout << "before resize: " << req << "(current line = " << currentLine << " [" << currentLine.size() << "])" << std::endl;
+		client->ResizeBuffer(currentLine.size() + 1);
+		//std::cout << "after resize: " << req << std::endl;
 	}
 	if (enter == true && (req[0] == '\n' || req[0] == '\r' || req[0] == '\0'))
+    {
+        //std::cout << "flushed\n";
 		client->FlushBuffer();
-}
+		Utils::ResetGetline();
+    }
+   }
 
 
 void 
