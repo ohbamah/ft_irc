@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/07 16:42:53 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/07 20:17:11 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -691,7 +691,7 @@ Req::__NICK(REQ_PARAMS)
     std::cout << GREEN << oldNick << " updated: " << oldNick << " is now known as " << newNick << "!" << RESET << std::endl;
 
     std::string userPrefix = client->GetUser().empty() ? "unknown" : client->GetUser();
-    std::string nickMsg = ":" + oldNick + "!" + userPrefix + "@" + hostname + " NICK :" + newNick + "\r\n";
+    std::string nickMsg = ":" + oldNick + "!" + userPrefix + "@localhost" + " NICK " + newNick + "\r\n";
 
     std::vector<Channel *> clientChannels = server.GetChannelsOfClient(client);
     for (size_t i = 0; i < clientChannels.size(); i++) {

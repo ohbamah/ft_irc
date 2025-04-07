@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/07 16:41:05 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/07 20:14:25 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,7 +154,6 @@ Server::BroadcastToChannel(Channel* channel, const std::string& message, Select 
     for (size_t i = 0; i < users.size(); i++) {
         Client* client = users[i];
         if (select->CanWrite(client->GetRemote()->Get())) {
-            std::cout << "envoyé! (" << message.c_str() << ")\n";
             send(client->GetRemote()->Get(), message.c_str(), message.size(), 0);
         }
     }
@@ -210,8 +209,8 @@ Server::sendChanInfos(Client *client, Channel *channel)
     
     if (!listOfMembers.empty())
     listOfMembers.erase(listOfMembers.size() - 1, 1);
-    std::string joinMessage = ":" + client->GetNick() + "!" + client->GetUser() + "@localhost JOIN " + channelName + "\r\n";
-    send(client->GetRemote()->Get(), joinMessage.c_str(), joinMessage.size(), 0);
+    //std::string joinMessage = ":" + client->GetNick() + "!" + client->GetUser() + "@localhost JOIN " + channelName + "\r\n";
+    //send(client->GetRemote()->Get(), joinMessage.c_str(), joinMessage.size(), 0);
     
     std::string namReply = ":localhost 353 " + nickname + " = " + channelName + " :" + listOfMembers + "\r\n";
     send(client->GetRemote()->Get(), namReply.c_str(), namReply.size(), 0);
