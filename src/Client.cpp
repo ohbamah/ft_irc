@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:28:02 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/03 11:39:46 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/07 16:09:24 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,11 +210,14 @@ Client::BufferIndexAddBy(unsigned int bytes)
 void
 Client::ResizeBuffer(unsigned int req1_size)
 {
-	char	tmp[IRC_MSG_SIZE] = {0};
-	int		size = strlen(&this->message[req1_size]);
-	std::memcpy(tmp, &this->message[req1_size], size);
-	std::memset(this->message, 0, IRC_MSG_SIZE);
-	std::memcpy(this->message, tmp, size);
+	//char	tmp[IRC_MSG_SIZE] = {0};
+	//int		size = strlen(&this->message[req1_size]);
+	//std::memcpy(tmp, &this->message[req1_size], size);
+	//std::memset(this->message, 0, IRC_MSG_SIZE);
+	//std::memcpy(this->message, tmp, size);
+	std::size_t	size = strlen(&this->message[req1_size]);
+	std::memcpy(this->message, &this->message[req1_size], size);
+	std::memset(&this->message[size], 0, IRC_MSG_SIZE - size - 1);
 }
 
 unsigned int

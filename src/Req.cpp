@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/03 13:39:48 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/07 16:42:53 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,55 +52,68 @@ Req::Check(Select& select, Server& server, std::vector<Channel>& channels, Clien
 	while (!((currentLine = Utils::Getline(req)).empty()))
 	{
 		Req::disconnected = false;
+		unsigned int i = 0;
+
 		std::cout << "\"\e[33m" << currentLine << "\e[0m\"" << std::endl;
 		enter = true;
 		if (!currentLine.empty() && currentLine[currentLine.size() - 1] == '\n')
 			currentLine.erase(currentLine.size() - 1);
 		if (!currentLine.empty() && currentLine[currentLine.size() - 1] == '\r')
 			currentLine.erase(currentLine.size() - 1);
-
+			
 		size_t spacePos = currentLine.find(' ');
 		Str cmd;
 		Str input;
 			
 		if (spacePos == std::string::npos)
 		{
-		    cmd = currentLine;
-		    input = "";
+			cmd = currentLine;
+			input = "";
 		}
 		else
 		{
-		    cmd = currentLine.substr(0, spacePos);
-		    input = currentLine.substr(spacePos + 1);
+			cmd = currentLine.substr(0, spacePos);
+			input = currentLine.substr(spacePos + 1);
 		}
 
 		bool found = false;
-		if (cmd == "PING" || cmd == "PONG" || cmd == "WHO")
-		    return;
-		for (int i = 0; i < REQ_COUNT; ++i)
+		//std::cout << "cmd : " << cmd << std::endl;
+		if (cmd == "PONG" || cmd == "WHO")
 		{
-			if (cmd[0] && !reqname[i].compare(cmd))
+			//std::cout << "PONG\n";
+			found = true;
+		}
+		else if (cmd == "PING")
+		{
+			if (select.CanWrite(client->GetRemote()->Get()))
+				send(client->GetRemote()->Get(), "PONG", 4, 0);
+			found = true;
+		}
+		else
+		{
+			for (int i = 0; i < REQ_COUNT; ++i)
 			{
-				reqfun[i](REQ_DATA);
-				found = true;
-				break;
+				if (cmd[0] && !reqname[i].compare(cmd))
+				{
+					reqfun[i](REQ_DATA);
+					found = true;
+					break;
+				}
 			}
 		}
-		if (disconnected == true)
+		if (Req::disconnected == true)
 			break ;
-
 		if (!found)
 			std::cout << RED << "Commande inconnue : " << cmd << RESET << std::endl;
 		//std::cout << "before resize: (current line = " << currentLine << " [" << currentLine.size() << "])\n" << req << std::endl;
-		unsigned int i = currentLine.size();
 		//std::cout << "i " << i << "\n";
-		for ( ; req[i] == '\n' || req[i] == '\r' ; ++i)
-			if (req[i] == '\0')
-				break ;
+		i = currentLine.size();
+		for ( ; req[i] && (req[i] == '\n' || req[i] == '\r') ; ++i)
+			;
 		client->ResizeBuffer(i);
 		//std::cout << "after resize: " << req << std::endl;
 	}
-	if (disconnected == false && enter == true && (req[0] == '\n' || req[0] == '\r' || req[0] == '\0'))
+	if (Req::disconnected == false && enter == true && (req[0] == '\n' || req[0] == '\r' || req[0] == '\0'))
 	{
 		//std::cout << "flushed\n";
 		client->FlushBuffer();
@@ -290,7 +303,7 @@ Req::__JOIN(REQ_PARAMS)
     }
 
     if (client->GetAuthenticated() == false || client->GetNick().empty() || client->GetUser().empty()) {
-        std::string errorMessage = ":localhost 421 " + client->GetNick() + " JOIN :Need to be logged in\r\n";
+      std::string errorMessage = ":localhost 421 " + client->GetNick() + " JOIN :Need to be logged in\r\n";
         if (select.CanWrite(client->GetRemote()->Get()))
             send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
         return;
@@ -379,7 +392,7 @@ Req::__JOIN(REQ_PARAMS)
             std::cout << GREEN << client->GetNick() << " has joined channel " << channelName << RESET << std::endl;
         } catch (const Channel::UserAlreadyInChannel& e) {}
 
-        std::string joinMessage = ":" + client->GetNick() + "!" + client->GetNick() + "@localhost JOIN " + channelName + "\r\n";
+        std::string joinMessage = ":" + client->GetNick() + "!" + client->GetUser() + "@localhost JOIN " + channelName + "\r\n";
         server.BroadcastToChannel(channel, joinMessage, &select);
 
         if (select.CanWrite(client->GetRemote()->Get()))
