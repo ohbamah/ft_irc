@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:27:12 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/03 11:35:01 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/07 20:35:54 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ Irc::Irc(int port, const char* pass)// : server(port, FControl::NonBlock)
 			std::cerr << "test\n";
 		}
 	}
-	
 }	
 
 Irc::~Irc()
@@ -110,7 +109,7 @@ void Irc::HandleClients(void)
 				i--;
 			}
 			else if (disconnected == false)
-				Req::Check(this->sync, this->server, this->channels, client);
+				Req::Check(this->sync, this->server, this->server.RefChannels()/*this->channels*/, client);
 		}
 	}
 }
@@ -133,7 +132,7 @@ Irc::DisconnectAnyone(Client* c)
 	this->sync.RemoveExcpReq(clientFd);
 	this->sync.RemoveReadReq(clientFd);
 	this->sync.RemoveWriteReq(clientFd);
-	for (unsigned long i = 0 ; i < this->channels.size() ; ++i)
-		this->channels[i].Disconnect(c);
+	//for (unsigned long i = 0 ; i < this->channels.size() ; ++i)
+	//	this->channels[i].Disconnect(c);
 	this->server.Disconnect(c);
 }

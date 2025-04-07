@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/07 20:14:25 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/07 20:55:39 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,12 @@ Server::Server(int port, int pFControlFlags) : Socket(Socket::AddrFamily::IPv4, 
 
 Server::~Server()
 {
-    //for (std::vector<Client*>::iterator it = this->clients.begin() ; it != this->clients.end() ; ++it)
-    //{
-    //    this->clients.erase(it);
-    //    (*it)->GetRemote()->Close();
-    //    delete (*it);
-    //}
+    std::cout << "FILS DAP\n";
+    for (std::map<std::string, Channel*>::iterator it = this->channels.begin() ; it != this->channels.end() ; ++it)
+    {
+        std::cout << "IT SECOND\n";
+        delete (it->second);
+    }
 }
 
 void
@@ -116,7 +116,9 @@ Server::GetChannel(const std::string& channelName) const
 void 
 Server::SetChannel(const std::string& channelName, Channel* channel) 
 {
-    channels[channelName] = channel;
+    if (this->channels.find(channelName) != this->channels.end())
+        delete (this->channels[channelName]);
+    this->channels[channelName] = channel;
 }
 
 
@@ -183,9 +185,8 @@ Server::FindClient(const std::string& name) const
 void 
 Server::CreateChannel(const std::string& channelName) 
 {
-    
-    Channel* newChannel = new Channel(channelName);
-    channels[channelName] = newChannel;
+    if (this->channels.find(channelName) == this->channels.end())
+        this->channels[channelName] = new Channel(channelName);
 }
 
 void 
@@ -246,7 +247,9 @@ Server::DeleteChannel(const std::string& channelName)
 {
     std::map<std::string, Channel*>::iterator it = channels.find(channelName);
     if (it != channels.end()) {
+        Channel* ptr = it->second;
         channels.erase(it);
+        delete (ptr);
     } 
 }
 
@@ -282,4 +285,8 @@ Server::RemoveClientChannel(Client* client, const std::string& channelName)
     }
 }
 
-
+std::map<std::string, Channel*>&
+Server::RefChannels(void)
+{
+    return (this->channels);
+}

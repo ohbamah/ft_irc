@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 15:25:43 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/02 19:24:57 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/07 20:37:37 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ public:
 private:
 	Select					sync;
 	Server					server;
-	std::vector<Channel>	channels;
+	//std::vector<Channel>	channels;
 	std::vector<pollfd>		polls;
 	Str 					mdp;
 

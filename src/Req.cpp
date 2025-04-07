@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/07 20:17:11 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/07 20:36:30 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void
 //}
 
 void 
-Req::Check(Select& select, Server& server, std::vector<Channel>& channels, Client* client)
+Req::Check(Select& select, Server& server, std::map<std::string, Channel*>& channels/*std::vector<Channel>& channels*/, Client* client)
 {
 	char*	req = client->GetMessage();
 	bool	enter = false;

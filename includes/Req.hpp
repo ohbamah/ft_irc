@@ -6,7 +6,7 @@
 /*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:33:17 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/03 13:37:51 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/07 20:36:44 by bama             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@
 
 //class Irc;
 
-# define REQ_PARAMS	Select& select, Server& server, std::vector<Channel>& channels, Client* client, char* req
+# define REQ_PARAMS	Select& select, Server& server, std::map<std::string, Channel*>& channels, Client* client, char* req
 # define REQ_DATA	select, server, channels, client, req
 # define UNUSED_REQ_PARAMS	(void)select, (void)server; (void)channels, (void)client; (void)req;
 # define REQ_COUNT	15
@@ -49,7 +49,7 @@ namespace Req
 	extern bool	disconnected;
 
 	void
-	Check(Select& select, Server& server, std::vector<Channel>& channels, Client* client);
+	Check(Select& select, Server& server, std::map<std::string, Channel*>& channels, Client* client);
 
 	void
 	__USER(REQ_PARAMS);
