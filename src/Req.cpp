@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Req.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 16:37:41 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/07 20:36:30 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/08 16:18:18 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,21 +26,8 @@ Req::reqname[REQ_COUNT] = {"CAP", "INVITE", "JOIN", "KICK", "MODE", "NICK", "PAS
 void
 (*Req::reqfun[REQ_COUNT])(REQ_PARAMS) = {Req::__CAP, Req::__INVITE, Req::__JOIN, Req::__KICK, Req::__MODE, Req::__NICK, Req::__PASS, Req::__TOPIC, Req::__USER, Req::__PRIVMSG, Req::__QUIT, Req::__PART};
 
-//static Str get_line(char** txt)
-//{
-//    Str ret;
-//    
-//    if (**txt == '\n')
-//        (*txt)++;
-//    
-//    while (**txt && **txt != '\n')
-//        ret.push_back(*((*txt)++));
-//    
-//    if (**txt == '\n')
-//        (*txt)++;
-//        
-//    return ret;
-//}
+// /join a,b ,456
+// ctrl D/Z
 
 void 
 Req::Check(Select& select, Server& server, std::map<std::string, Channel*>& channels/*std::vector<Channel>& channels*/, Client* client)
@@ -54,7 +41,7 @@ Req::Check(Select& select, Server& server, std::map<std::string, Channel*>& chan
 		Req::disconnected = false;
 		unsigned int i = 0;
 
-		std::cout << "\"\e[33m" << currentLine << "\e[0m\"" << std::endl;
+		//std::cout << "\"\e[33m" << currentLine << "\e[0m\"" << std::endl;
 		enter = true;
 		if (!currentLine.empty() && currentLine[currentLine.size() - 1] == '\n')
 			currentLine.erase(currentLine.size() - 1);
@@ -86,7 +73,7 @@ Req::Check(Select& select, Server& server, std::map<std::string, Channel*>& chan
 		else if (cmd == "PING")
 		{
 			if (select.CanWrite(client->GetRemote()->Get()))
-				send(client->GetRemote()->Get(), "PONG", 4, 0);
+				send(client->GetRemote()->Get(), "PONG\r\n", 6, 0);
 			found = true;
 		}
 		else
@@ -536,7 +523,7 @@ Req::__MODE(REQ_PARAMS)
             addMode = false;
             continue;
         }
-        switch (mode) {
+        switch (mode) { //Irssi: critical nicklist_set_host: assertion 'host != NULL' failed
             case 'b':
                 return;
             case 'i':
@@ -547,7 +534,7 @@ Req::__MODE(REQ_PARAMS)
             } else {
                 channel->SetInviteOnly(addMode);
             }
-                break; //? Break ?
+                break;//
             case 'k':  
                 if (addMode) {
                     if (std::getline(iss, mdp)) {
@@ -605,7 +592,7 @@ Req::__MODE(REQ_PARAMS)
         }
     }
     
-    std::string modeResponse = ":" + client->GetNick() + " MODE " + channelName + " " + modes + "\r\n";
+    std::string modeResponse = ":" + client->GetNick() + "!" + client->GetUser() + "@localhost" + " MODE " + channelName + " " + modes + "\r\n";
     if (select.CanWrite(client->GetRemote()->Get())) {
         server.BroadcastToChannel(channel, modeResponse.c_str(), &select);
     }
@@ -823,7 +810,7 @@ Req::__TOPIC(REQ_PARAMS)
     }
 
     channelName->SetTopic(topic);
-    std::string topicChangeMessage = ":" + client->GetNick() + " TOPIC " + channel + " :" + topic + "\r\n";
+    std::string topicChangeMessage = ":" + client->GetNick() + "!" + client->GetUser() + "@localhost" + " TOPIC " + channel + " :" + topic + "\r\n";
     server.BroadcastToChannel(channelName, topicChangeMessage, &select);
 }
 
@@ -897,6 +884,7 @@ Req::__USER(REQ_PARAMS)
     client->SetRealname(realname);
     client->SetHostname(hostname);
     client->SetServername(servername);
+    //std::cout << client->GetServername() << std::endl;
 
     if (client->GetAuthenticated() == true && client->HasSetNick()) {
         if (select.CanWrite(client->GetRemote()->Get())){
@@ -961,8 +949,8 @@ Req::__PRIVMSG(REQ_PARAMS)
                     send(client->GetRemote()->Get(), errorMessage.c_str(), errorMessage.size(), 0);
             } else {
                 if (channel->HasClient(client)) {
-                    std::string errorMessage = ":" + client->GetNick() + " PRIVMSG " + target + " " + message + "\r\n";
-                    channel->broadcastMessage(client, errorMessage, select);
+                    std::string msgToSend = ":" + client->GetNick() + "!" + client->GetUser() + "@localhost" + " PRIVMSG " + target + " " + message + "\r\n";
+                    channel->broadcastMessage(client, msgToSend, select);
                 } else {
                     std::string errorMessage = ":localhost 442 " + client->GetNick() + " " + target + " :You're not on that channel\r\n";
                     if (select.CanWrite(client->GetRemote()->Get()))

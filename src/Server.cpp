@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bama <bama@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: ymanchon <ymanchon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 15:36:42 by ymanchon          #+#    #+#             */
-/*   Updated: 2025/04/07 20:55:39 by bama             ###   ########.fr       */
+/*   Updated: 2025/04/08 15:41:18 by ymanchon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,8 @@ Server::Server(int port, int pFControlFlags) : Socket(Socket::AddrFamily::IPv4, 
 
 Server::~Server()
 {
-    std::cout << "FILS DAP\n";
     for (std::map<std::string, Channel*>::iterator it = this->channels.begin() ; it != this->channels.end() ; ++it)
-    {
-        std::cout << "IT SECOND\n";
         delete (it->second);
-    }
 }
 
 void
@@ -157,6 +153,7 @@ Server::BroadcastToChannel(Channel* channel, const std::string& message, Select 
         Client* client = users[i];
         if (select->CanWrite(client->GetRemote()->Get())) {
             send(client->GetRemote()->Get(), message.c_str(), message.size(), 0);
+            //std::cout << message.c_str() << std::endl;
         }
     }
 }
